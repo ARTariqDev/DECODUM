@@ -82,7 +82,7 @@ export default function LandingPage() {
           fadeStates.button ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <Button text="Login" onClick={null}/>
+        <Button text="Login" onClick={null}/> {/*null for now, we'll add this later also notice how there is no signup button, its cause the team ids and passwords will be hardcoded*/}
       </div>
     </main>
   );
