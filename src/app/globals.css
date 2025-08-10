@@ -24,3 +24,28 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+
+.marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 12s linear infinite;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+  @keyframes glow {
+                    from {
+                        text-shadow: 0 0 5px #fff8de;
+                    }
+                    to {
+                        text-shadow: 0 0 15px #fff8de;
+                    }
+                }
