@@ -25,7 +25,7 @@ const Tube = () => {
   );
 
   return (
-    <div className="bg-[#111111] container mx-auto overflow-hidden h-[2rem] w-[95vw] border-2 border-[#fff8de] rounded-xl m-4">
+    <div className="bg-[#111111] container mx-auto overflow-hidden h-[2rem] w-[95vw] border-2 border-[#fff8de] rounded-xl m-4 ">
       <div className="marquee flex">
         {textContent}
         {textContent}
