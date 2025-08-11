@@ -16,11 +16,18 @@ const Hero = () => {
   });
 
   useEffect(() => {
+  setTimeout(() => {
+
+    setFadeStates((prev) => ({ ...prev, tube1: true }));
+
     setTimeout(() => {
-      setFadeStates((prev) => ({ ...prev, tube1: true }));
+
+      setFadeStates((prev) => ({ ...prev, tube2: true }));
 
       setTimeout(() => {
+ 
         setFadeStates((prev) => ({ ...prev, hero: true }));
+
         let currentIndex = 0;
         const timer = setInterval(() => {
           if (currentIndex <= fullText.length) {
@@ -28,20 +35,21 @@ const Hero = () => {
             currentIndex++;
           } else {
             clearInterval(timer);
+
             setTimeout(() => setShowSubtext(true), 400);
           }
         }, typingSpeed);
+
 
         setTimeout(() => {
           setFadeStates((prev) => ({ ...prev, button: true }));
         }, fullText.length * typingSpeed + 800);
 
-        setTimeout(() => {
-          setFadeStates((prev) => ({ ...prev, tube2: true }));
-        }, fullText.length * typingSpeed + 1600);
-      }, 500);
-    }, 300);
-  }, []);
+      }, 500); 
+    }, 500); 
+  }, 300);
+}, []);
+
 
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
