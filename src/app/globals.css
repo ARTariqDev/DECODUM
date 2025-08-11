@@ -49,3 +49,35 @@ body {
 }
 
 
+.film-grain-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.film-grain-wrapper::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1.5px);
+  background-size: 3px 3px;
+  mix-blend-mode: screen;
+  opacity: 0.45;
+  animation: grainMove 8s linear infinite;
+  z-index: 10;
+  -webkit-animation: grainMove 8s linear infinite;
+}
+
+@keyframes grainMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
