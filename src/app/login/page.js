@@ -8,27 +8,41 @@ function LoginPage() {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen space-y-4 container">
       <form
-        className="flex flex-col items-center p-6 px-14 rounded-lg w-[35vw] max-w-[600px] min-w-[400px] backdrop-blur-sm"
+        className="flex flex-col items-center p-6 px-14 rounded-lg w-[35vw] max-w-[600px] w-[90vw] backdrop-blur-sm"
         style={{
           animation: "border-glow 2s linear infinite alternate",
-          fontFamily: "anta-regular, monospace",
+          fontFamily: "Anta-Regular, monospace",
         }}
       >
         <h1
-          className="text-center text-[clamp(2rem,6vw,8rem)] tracking-wide"
           style={{
+            fontFamily: "Anta-Regular, monospace",
             WebkitTextStroke: "2px #fff8de",
             WebkitTextFillColor: "transparent",
             color: "transparent",
             textShadow: "0 0 8px #fff8de",
             animation: "glow 2s ease-in-out infinite alternate",
             whiteSpace: "nowrap",
+            transform: "scaleY(1.3)",
+            transformOrigin: "center",
           }}
+          className="text-center text-[clamp(2rem,6vw,8rem)]"
         >
           Login
+          <span
+            className="animate-pulse ml-1"
+            style={{
+              WebkitTextStroke: "inherit",
+              WebkitTextFillColor: "transparent",
+            }}
+          >
+            |
+          </span>
         </h1>
+
         <Input type="text" placeholder="TeamID" icon={faUser} />
-        <Input type="text" placeholder="Password" icon={faLock} />
+        <Input type="password" placeholder="Password" icon={faLock} />
+
         <div className="w-full mt-8">
           <Button text="Login" bgColor="#fff8de" textColor="#111" />
         </div>
