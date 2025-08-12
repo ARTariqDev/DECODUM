@@ -53,7 +53,7 @@ const Hero = () => {
 
 
   return (
-    <div className="flex flex-col items-center justify-center space-y-4">
+    <div className="flex flex-col items-center justify-center space-y-4 w-[100vw]">
 
       <div className={`transition-opacity duration-1000 ease-in-out ${fadeStates.tube1 ? 'opacity-100' : 'opacity-0'}`}>
         <Tube />

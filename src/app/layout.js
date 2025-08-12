@@ -20,8 +20,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased  film-grain-wrapper flex flex-col justify-center space-y-4`}
       >
+
         <main
           className="min-h-screen"
           style={{
