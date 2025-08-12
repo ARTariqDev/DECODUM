@@ -4,6 +4,8 @@ const Button = ({
   text,
   glowColor = "#fff8de",
   onClick,
+  bgColor = "transparent",
+  textColor = "#fff",
 }) => {
   const btnRef = useRef(null);
   const [hovered, setHovered] = useState(false);
@@ -45,9 +47,12 @@ const Button = ({
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}
-        className={`relative px-10 py-4 rounded-xl text-white font-bold overflow-hidden transition duration-150 active:scale-95 border border-[#fff8de]/30 backdrop-blur-md cursor-pointer !bg-transparent appearance-none hover:animate-glitch`}
+        className={`relative px-10 py-4 rounded-xl font-bold overflow-hidden transition duration-150 active:scale-95 border border-[#fff8de]/30 backdrop-blur-md cursor-pointer appearance-none hover:animate-glitch w-full`}
+        style={{
+          backgroundColor: bgColor,
+          color: textColor,
+        }}
       >
-
         <span
           className="absolute inset-0 pointer-events-none rounded-xl border z-10 transition-opacity duration-300 ease-out"
           style={{
@@ -60,7 +65,6 @@ const Button = ({
             boxShadow: hovered ? `0 0 20px ${glowColor}` : "none",
           }}
         />
-
 
         {ripples.map((ripple) => (
           <span
@@ -77,12 +81,10 @@ const Button = ({
           />
         ))}
 
-
         <span className="relative z-20 text-xl uppercase tracking-widest">
           {text}
         </span>
       </button>
-
     </>
   );
 };

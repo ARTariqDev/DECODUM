@@ -48,6 +48,14 @@ body {
   }
 }
 
+@keyframes border-glow {
+  from {
+    box-shadow: 0 0 5px #fff8de;
+  }
+  to {
+    box-shadow: 0 0 15px #fff8de;
+  }
+}
 
 .film-grain-wrapper {
   position: relative;
@@ -64,7 +72,10 @@ body {
   bottom: 0;
   width: 100%;
   height: 100%;
-  background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1.5px);
+  background-image: radial-gradient(
+    rgba(255, 255, 255, 0.15) 1px,
+    transparent 1.5px
+  );
   background-size: 3px 3px;
   mix-blend-mode: screen;
   opacity: 0.45;

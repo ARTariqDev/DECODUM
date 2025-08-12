@@ -5,6 +5,7 @@ import Hero from "@/components/Hero";
 export default function LandingPage() {
   return (
     <div className="film-grain-wrapper flex flex-col items-center justify-center space-y-4">
+<<<<<<< HEAD
       <main
         className="min-h-screen"
         style={{
@@ -19,6 +20,9 @@ export default function LandingPage() {
           <Hero />
         </div>
       </main>
+=======
+      <Hero />
+>>>>>>> d5ca54235b9cfe4480b43902358a5a9d4646c14f
     </div>
   );
 }
