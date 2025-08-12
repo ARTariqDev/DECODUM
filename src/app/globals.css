@@ -81,3 +81,7 @@ body {
     background-position: 100% 100%;
   }
 }
+
+html, body, button, a, input, textarea {
+  cursor: url('/cursor.svg') 10 10, auto !important;
+}

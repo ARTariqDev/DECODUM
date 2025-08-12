@@ -11,11 +11,14 @@ export default function LandingPage() {
           backgroundColor: "#111111",
           backgroundImage: `radial-gradient(circle, rgba(255, 248, 222, 0.35) 0.8px, transparent 0.8px)`,
           backgroundSize: "22px 22px",
-          backgroundPosition: "0 0"
+          backgroundPosition: "0 0",
+          overflow: "hidden",
         }}
       >
-        <Hero />
-    </main>
+        <div className="tv-turn-on-effect">
+          <Hero />
+        </div>
+      </main>
     </div>
   );
 }
