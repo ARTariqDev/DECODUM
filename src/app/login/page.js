@@ -6,7 +6,7 @@ import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
 
 function LoginPage() {
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen space-y-4">
+    <main className="flex flex-col items-center justify-center min-h-screen space-y-4 container">
       <form
         className="flex flex-col items-center p-6 px-14 rounded-lg w-[35vw] max-w-[600px] min-w-[400px] backdrop-blur-sm"
         style={{
@@ -27,7 +27,7 @@ function LoginPage() {
         >
           Login
         </h1>
-        <Input type="text" placeholder="Team Name" icon={faUser} />
+        <Input type="text" placeholder="TeamID" icon={faUser} />
         <Input type="text" placeholder="Password" icon={faLock} />
         <div className="w-full mt-8">
           <Button text="Login" bgColor="#fff8de" textColor="#111" />
