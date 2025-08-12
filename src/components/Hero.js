@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Button from './Button';
 import Tube from './Tube';
+import Link from 'next/link';
 
 const Hero = () => {
   const [displayText, setDisplayText] = useState('');
@@ -122,13 +123,16 @@ const Hero = () => {
             alignItems: 'center',
           }}
         >
-          <Button
-            text="→"
-            glowColor="#fff8de"
-            onClick={() => {
-              console.log('Button clicked!');
-            }}
-          />
+          <Link href="/login">
+            <Button
+              text="→"
+              glowColor="#fff8de"
+              onClick={() => {
+                console.log('Button clicked!');
+              }}
+            />
+          </Link>
+          
         </div>
       </div>
 
