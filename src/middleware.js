@@ -14,9 +14,10 @@ export async function middleware(req) {
   if (isProtectedRoute && !payload) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
-  if (isPublicRoute && payload) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
+  //commenting this until we make more pages
+  //   if (isPublicRoute && payload) {
+  //     return NextResponse.redirect(new URL("/", req.url));
+  //   }
   return NextResponse.next();
 }
 
