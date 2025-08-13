@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
+//TODO: Change the secret word and add it to the env file later
 const secretWord = "my_secret";
 const secret = new TextEncoder().encode(secretWord);
 

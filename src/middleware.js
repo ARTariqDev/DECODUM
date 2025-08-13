@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { verifyJWT } from "@/lib/session";
 
-const protectedRoutes = ["/"];
-const publicRoutes = ["/login"];
+const protectedRoutes = [""];
+const publicRoutes = ["/login", "/"];
 
 export async function middleware(req) {
   const path = req.nextUrl.pathname; //gives the path of the request
