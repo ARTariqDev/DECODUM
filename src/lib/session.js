@@ -12,13 +12,15 @@ async function createJWT(payload) {
     .sign(secret);
 }
 
+//TODO: expiration time is 2min. Change it later.
 export async function createSession(TeamId) {
   const expiresAt = new Date(Date.now() + 2 * 60 * 1000);
   const session = await createJWT({ TeamId, expiresAt });
-  cookies().set("session", session, {
+  const c = await cookies();
+  c.set("session", session, {
     httpOnly: true,
-    secure: true,
     expires: expiresAt,
+    secure: true,
   });
 }
 
@@ -30,5 +32,12 @@ export async function verifyJWT(session) {
     return payload;
   } catch (error) {
     console.error("Failed to verify session");
+    return null;
   }
+}
+
+// in case we want to log out
+export async function deleteSession() {
+  const c = await cookies();
+  c.delete("session");
 }
