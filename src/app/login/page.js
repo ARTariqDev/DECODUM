@@ -1,14 +1,20 @@
 "use client";
 
+import { useActionState } from "react";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
+import { loginAction } from "@/actions/auth";
 
 function LoginPage() {
+  const [error, Action, pending] = useActionState(loginAction, {
+    message: "",
+  });
   return (
     <main className="flex flex-col items-center justify-center min-h-screen space-y-4 container">
       <form
-        className="flex flex-col items-center p-6 px-14 rounded-lg w-[35vw] max-w-[600px] w-[90vw] backdrop-blur-sm"
+        action={Action}
+        className="flex flex-col items-center p-6 px-14 rounded-lg max-w-[600px] w-[90vw] backdrop-blur-sm"
         style={{
           animation: "border-glow 2s linear infinite alternate",
           fontFamily: "Anta-Regular, monospace",
@@ -40,10 +46,22 @@ function LoginPage() {
           </span>
         </h1>
 
-        <Input type="text" placeholder="TeamID" icon={faUser} />
-        <Input type="password" placeholder="Password" icon={faLock} />
-
-        <div className="w-full mt-8">
+        <Input type="text" placeholder="TeamID" icon={faUser} name="teamID" />
+        {error?.teamID && (
+          <p className="text-red-500 text-sm mt-3">{error.teamID}</p>
+        )}
+        <Input
+          type="text"
+          placeholder="Password"
+          icon={faLock}
+          name="password"
+        />
+        {(error?.password || error?.message) && (
+          <p className="text-red-500 text-sm mt-3">
+            {error.message || error.password}
+          </p>
+        )}
+        <div className="w-full mt-5">
           <Button text="Login" bgColor="#fff8de" textColor="#111" />
         </div>
       </form>

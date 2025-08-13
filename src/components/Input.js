@@ -26,14 +26,14 @@ function Input({
         ref={inputRef}
         type={type}
         name={name}
-        className="flex-1 focus:outline-none border-none placeholder:text-gray-400"
+        className="flex-1 focus:outline-none border-none placeholder:text-gray-400 !bg-transparent"
         style={{
           color: textColor,
           fontFamily: "anta-regular, monospace",
-          backgroundColor: "transparent",
         }}
         onFocus={() => setIsFocused(true)}
         onBlur={() => !inputRef.current?.value && setIsFocused(false)}
+        autoComplete="off"
       />
       {icon && (
         <div className="ml-3 mb-[1px] text-white">
