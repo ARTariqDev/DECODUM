@@ -13,8 +13,8 @@ export const loginAction = async (prevState, formData) => {
     let validationError = data.validateSync();
     if (validationError) {
       return {
-        password: validationError.errors["password"].message,
-        teamID: validationError.errors["teamID"].message,
+        password: validationError.errors["password"]?.message || "",
+        teamID: validationError.errors["teamID"]?.message || "",
       };
     }
     //check for the team
