@@ -14,7 +14,7 @@ function LoginPage() {
     e.preventDefault();
     const formData = new FormData(e.target);
     const res = await fetch("/api/auth", {
-      method: "post",
+      method: "POST",
       body: formData,
     });
     if (!res.ok) {
