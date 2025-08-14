@@ -1,19 +1,34 @@
 "use client";
-
-import { useActionState } from "react";
+// import { useActionState } from "react";
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
-import { loginAction } from "@/actions/auth";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
+// TODO: will add client side validation later
 function LoginPage() {
-  const [error, Action, pending] = useActionState(loginAction, {
-    message: "",
-  });
+  const [error, setError] = useState(null);
+  const router = useRouter();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const res = await fetch("/api/auth", {
+      method: "post",
+      body: formData,
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      console.error("Login Error:", error);
+      setError(error);
+    } else {
+      router.push("/");
+    }
+  };
   return (
     <main className="flex flex-col items-center justify-center min-h-screen space-y-4 container">
       <form
-        action={Action}
+        onSubmit={handleSubmit}
         className="flex flex-col items-center p-6 px-14 rounded-lg max-w-[600px] w-[90vw] backdrop-blur-sm"
         style={{
           animation: "border-glow 2s linear infinite alternate",
@@ -46,22 +61,28 @@ function LoginPage() {
           </span>
         </h1>
 
-        <Input type="text" placeholder="TeamID" icon={faUser} name="teamID" />
-        {error?.teamID && (
-          <p className="text-red-500 text-sm mt-3">{error.teamID}</p>
-        )}
-        <Input
-          type="text"
-          placeholder="Password"
-          icon={faLock}
-          name="password"
-        />
-        {(error?.password || error?.message) && (
-          <p className="text-red-500 text-sm mt-3">
-            {error.message || error.password}
-          </p>
-        )}
-        <div className="w-full mt-5">
+        <div className="w-full relative">
+          <Input type="text" placeholder="TeamID" icon={faUser} name="teamID" />
+          {error?.teamID && (
+            <p className="text-red-500 text-sm absolute pt-2 right-1/2 translate-x-1/2">
+              {error.teamID}
+            </p>
+          )}
+        </div>
+        <div className="w-full mt-2 relative">
+          <Input
+            type="text"
+            placeholder="Password"
+            icon={faLock}
+            name="password"
+          />
+          {(error?.password || error?.message) && (
+            <p className="text-red-500 text-sm absolute pt-2 right-1/2 translate-x-1/2">
+              {error.message || error.password}
+            </p>
+          )}
+        </div>
+        <div className="w-full mt-10">
           <Button text="Login" bgColor="#fff8de" textColor="#111" />
         </div>
       </form>
