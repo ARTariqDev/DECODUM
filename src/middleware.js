@@ -16,7 +16,7 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // Redirect logged-in users away from login page
+
   if (publicRoutes.includes(path) && payload) {
     return NextResponse.redirect(new URL("/tasks", req.url));
   }
