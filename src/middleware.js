@@ -1,26 +1,35 @@
 import { NextResponse } from "next/server";
 import { verifyJWT } from "@/lib/session";
 
-const protectedRoutes = [""];
+
+const protectedRoutes = ["/tasks"];
+
 const publicRoutes = ["/login"];
 
 export async function middleware(req) {
-  const path = req.nextUrl.pathname; //gives the path of the request
-  const isProtectedRoute = protectedRoutes.includes(path);
-  const isPublicRoute = publicRoutes.includes(path);
+  const path = req.nextUrl.pathname;
   const session = req.cookies.get("session")?.value;
   const payload = session ? await verifyJWT(session) : null;
 
-  if (isProtectedRoute && !payload) {
+  // Redirect unauthenticated users trying to access protected routes
+  if (protectedRoutes.includes(path) && !payload) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
-  //commenting this until we make more pages
-  if (isPublicRoute && payload) {
-    return NextResponse.redirect(new URL("/", req.url));
+
+  // Redirect logged-in users away from login page
+  if (publicRoutes.includes(path) && payload) {
+    return NextResponse.redirect(new URL("/tasks", req.url));
   }
+
+
+  if (path === "/" && payload) {
+    return NextResponse.redirect(new URL("/tasks", req.url));
+  }
+
   return NextResponse.next();
 }
 
-//user will be redirected to the login page even if they try to go to home page
-// i think the home page should be linked to the first question.
-// to change this, remove the home page from the protected routes
+// a matcher to run middleware on all routes
+export const config = {
+  matcher: ["/", "/login", "/tasks"],
+};
