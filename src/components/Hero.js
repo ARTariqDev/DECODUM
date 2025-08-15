@@ -127,9 +127,6 @@ const Hero = () => {
             <Button
               text="→"
               glowColor="#fff8de"
-              onClick={() => {
-                console.log('Button clicked!');
-              }}
             />
           </Link>
           

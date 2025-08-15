@@ -6,6 +6,8 @@ const Button = ({
   onClick,
   bgColor = "transparent",
   textColor = "#fff",
+  className = "", // allow additional classes cause we need to adjust font size and width
+  textSize = "text-base", // default font size (since no class specified for the button ins Hero.js)
 }) => {
   const btnRef = useRef(null);
   const [hovered, setHovered] = useState(false);
@@ -40,52 +42,50 @@ const Button = ({
   };
 
   return (
-    <>
-      <button
-        ref={btnRef}
-        onMouseEnter={handleMouseEnter}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        onClick={handleClick}
-        className={`relative px-10 py-4 rounded-xl font-bold overflow-hidden transition duration-150 active:scale-95 border border-[#fff8de]/30 backdrop-blur-md cursor-pointer appearance-none hover:animate-glitch w-full`}
+    <button
+      ref={btnRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
+      className={`relative px-6 py-3 rounded-xl font-bold overflow-hidden transition duration-150 active:scale-95 border border-[#fff8de]/30 backdrop-blur-md cursor-pointer appearance-none hover:animate-glitch w-full ${className}`}
+      style={{
+        backgroundColor: bgColor,
+        color: textColor,
+      }}
+    >
+      <span
+        className="absolute inset-0 pointer-events-none rounded-xl border z-10 transition-opacity duration-300 ease-out"
         style={{
-          backgroundColor: bgColor,
-          color: textColor,
+          borderColor: glowColor,
+          borderWidth: "3px",
+          opacity: hovered ? 1 : 0,
+          maskImage: `radial-gradient(150px at var(--x, 0px) var(--y, 0px), white 0%, transparent 70%)`,
+          WebkitMaskImage: `radial-gradient(150px at var(--x, 0px) var(--y, 0px), white 0%, transparent 70%)`,
+          transition: "mask-position 0.05s linear, opacity 0.3s ease-out",
+          boxShadow: hovered ? `0 0 20px ${glowColor}` : "none",
         }}
-      >
+      />
+
+      {ripples.map((ripple) => (
         <span
-          className="absolute inset-0 pointer-events-none rounded-xl border z-10 transition-opacity duration-300 ease-out"
+          key={ripple.id}
+          className="absolute rounded-full bg-white/20 animate-ripple"
           style={{
-            borderColor: glowColor,
-            borderWidth: "3px",
-            opacity: hovered ? 1 : 0,
-            maskImage: `radial-gradient(150px at var(--x, 0px) var(--y, 0px), white 0%, transparent 70%)`,
-            WebkitMaskImage: `radial-gradient(150px at var(--x, 0px) var(--y, 0px), white 0%, transparent 70%)`,
-            transition: "mask-position 0.05s linear, opacity 0.3s ease-out",
-            boxShadow: hovered ? `0 0 20px ${glowColor}` : "none",
+            left: ripple.x - 60,
+            top: ripple.y - 60,
+            width: 120,
+            height: 120,
+            pointerEvents: "none",
+            zIndex: 5,
           }}
         />
+      ))}
 
-        {ripples.map((ripple) => (
-          <span
-            key={ripple.id}
-            className="absolute rounded-full bg-white/20 animate-ripple"
-            style={{
-              left: ripple.x - 60,
-              top: ripple.y - 60,
-              width: 120,
-              height: 120,
-              pointerEvents: "none",
-              zIndex: 5,
-            }}
-          />
-        ))}
-
-        <span className="relative z-20 text-xl uppercase tracking-widest">
-          {text}
-        </span>
-      </button>
-    </>
+      <span className={`relative z-20 uppercase tracking-widest ${textSize}`}>
+        {text}
+      </span>
+    </button>
   );
 };
 

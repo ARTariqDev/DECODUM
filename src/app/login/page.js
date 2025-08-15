@@ -22,7 +22,7 @@ function LoginPage() {
       console.error("Login Error:", error);
       setError(error);
     } else {
-      router.push("/");
+      router.push("/tasks");
     }
   };
   return (
