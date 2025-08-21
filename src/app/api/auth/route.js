@@ -1,7 +1,6 @@
 import { dbConnect } from "@/lib/dbConnect";
 import LoginModel from "@/models/login";
 import { createSession } from "@/lib/session";
-import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {

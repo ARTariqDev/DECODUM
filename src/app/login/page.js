@@ -6,23 +6,33 @@ import { faUser, faLock } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-// TODO: will add client side validation later
 function LoginPage() {
   const [error, setError] = useState(null);
   const router = useRouter();
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
-    const res = await fetch("/api/auth", {
-      method: "POST",
-      body: formData,
-    });
-    if (!res.ok) {
-      const error = await res.json();
-      console.error("Login Error:", error);
-      setError(error);
+    const hasTeamID = formData.get("teamID");
+    const hasPassword = formData.get("password");
+
+    if (hasTeamID && hasPassword) {
+      setError({});
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        console.error("Login Error:", error);
+        setError(error);
+      } else {
+        router.push("/tasks");
+      }
     } else {
-      router.push("/tasks");
+      setError({
+        teamID: !hasTeamID && "TeamID is required!",
+        password: !hasPassword && "Password is required!",
+      });
     }
   };
   return (
@@ -69,7 +79,7 @@ function LoginPage() {
             </p>
           )}
         </div>
-        <div className="w-full mt-2 relative">
+        <div className="w-full mt-2.5 relative">
           <Input
             type="text"
             placeholder="Password"

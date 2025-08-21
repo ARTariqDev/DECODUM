@@ -14,7 +14,7 @@ function Input({
   return (
     <div className="w-full relative pt-[8px] pb-[7px] px-6 mt-6 flex items-end border border-gray-300/50 rounded-4xl backdrop-blur-sm bg-white/2 focus-within:border-gray-400 hover:border-gray-400 tracking-wide transition-all duration-200 h-11.5 group">
       <span
-        className={`text-gray-400 inline-block absolute transition-all duration-250 ease-in-out ${
+        className={`text-gray-400 inline-block absolute transition-all duration-250 ease-in-out pointer-events-none ${
           isFocused
             ? "top-0.5 text-[11px] opacity-100"
             : "top-1/2 -translate-y-1/2 opacity-70"
