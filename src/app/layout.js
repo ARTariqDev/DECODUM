@@ -20,11 +20,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased  film-grain-wrapper flex flex-col justify-center space-y-4`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased film-grain-wrapper`}
       >
-
-        <main
-          className="min-h-screen"
+        <div
+          className="min-h-screen w-full"
           style={{
             backgroundColor: "#111111",
             backgroundImage: `radial-gradient(circle, rgba(255, 248, 222, 0.35) 0.8px, transparent 0.8px)`,
@@ -33,8 +32,9 @@ export default function RootLayout({ children }) {
           }}
         >
           {children}
-        </main>
+        </div>
       </body>
     </html>
   );
 }
+

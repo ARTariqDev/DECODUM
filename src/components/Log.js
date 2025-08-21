@@ -3,12 +3,12 @@ import React from "react";
 const Log = ({ title, date, desc }) => {
   return (
     <article
-      className="w-[95%] max-w-4xl border border-[#fff8de]/30 rounded-2xl p-6 mb-8
+      className="w-[75%] max-w-4xl border border-[#fff8de]/30 rounded-2xl p-6 mb-8
       backdrop-blur-md text-[#fff8de] shadow-lg"
       style={{
         fontFamily: "Anta-Regular, monospace",
       }}
-    >
+    > 
 
       <h1
         className="text-3xl md:text-5xl font-bold mb-2 text-center md:text-left"

@@ -4,20 +4,20 @@ import LogCard from "@/components/LogCard";
 import Log from "@/components/Log";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import logs from "./LogData.json"; // ✅ Import JSON
+import logs from "./LogData.json";
 
 const LogPage = () => {
   const [selectedLog, setSelectedLog] = useState(null);
 
   return (
-    <main className="min-h-screen flex flex-col bg-black/80 text-[#fff8de]">
-      {/* Navbar stays at top */}
+    <main className="min-h-screen flex flex-col bg-black/80 text-[#fff8de] ">
+
       <div className="mt-[5rem]">
         <Navbar />
       </div>
 
-      {/* Page Content */}
-      <div className="flex-grow flex flex-col items-center justify-start py-10 px-4">
+
+      <div className="flex-grow flex flex-col items-center justify-start py-10 px-10">
         {selectedLog ? (
           <div className="w-full flex flex-col items-center max-w-4xl animate-fadeIn">
             <Log
@@ -46,7 +46,7 @@ const LogPage = () => {
                   title={log.title}
                   date={log.date}
                   desc={log.desc}
-                  onView={() => setSelectedLog(log)} // ✅ for "View Log" button
+                  onView={() => setSelectedLog(log)} 
                 />
               </div>
             ))}
@@ -54,7 +54,7 @@ const LogPage = () => {
         )}
       </div>
 
-      {/* Footer stays at bottom */}
+ 
       <Footer />
     </main>
   );

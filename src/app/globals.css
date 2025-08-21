@@ -59,8 +59,10 @@ body {
 
 .film-grain-wrapper {
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden; /*this was overflow: didden before so it wouldnt let user scroll*/
+  overflow-y: auto;    
 }
+
 
 .film-grain-wrapper::after {
   content: "";

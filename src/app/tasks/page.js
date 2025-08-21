@@ -11,7 +11,7 @@ const Tasks = () => {
   const [showDescription, setShowDescription] = useState(true);
   //adding random video link and task description, we will fetch this from a json file or db later
   return (
-    <div className="flex flex-col h-[100vh]">
+    <div className="flex flex-col ">
       <Navbar />
 
 

@@ -8,10 +8,10 @@ const LogCard = ({ title, date, desc, onView }) => {
       transition-all"
       style={{
         fontFamily: "Anta-Regular, monospace",
-        height: "320px", // fixed height for consistency
+        height: "275px", // changed the height to 15rem cause they were too big before
       }}
     >
-      {/* Title + Date */}
+
       <div>
         <h2
           className="text-xl font-bold tracking-wide text-center md:text-left"
@@ -25,10 +25,10 @@ const LogCard = ({ title, date, desc, onView }) => {
         </h2>
         <span className="text-sm text-[#fff8de]/70">{date}</span>
 
-        {/* Separator */}
+
         <div className="border-t border-[#fff8de]/30 my-2"></div>
 
-        {/* Preview Text */}
+
         <div
           className="text-sm md:text-base leading-relaxed text-justify"
           style={{
@@ -43,7 +43,6 @@ const LogCard = ({ title, date, desc, onView }) => {
         </div>
       </div>
 
-      {/* View Log Button */}
       <button
         onClick={onView}
         className="mt-4 px-4 py-2 rounded-lg border border-[#fff8de]/50 text-[#fff8de] 
