@@ -8,6 +8,7 @@ const Button = ({
   textColor = "#fff",
   className = "", // allow additional classes cause we need to adjust font size and width
   textSize = "text-base", // default font size (since no class specified for the button ins Hero.js)
+  disabled = false,
 }) => {
   const btnRef = useRef(null);
   const [hovered, setHovered] = useState(false);
@@ -53,6 +54,7 @@ const Button = ({
         backgroundColor: bgColor,
         color: textColor,
       }}
+      disabled={disabled}
     >
       <span
         className="absolute inset-0 pointer-events-none rounded-xl border z-10 transition-opacity duration-300 ease-out"
