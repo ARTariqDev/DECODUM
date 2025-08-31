@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Noise from '../assets/static.svg';
 
 const Tube = () => {
+  // .
   const textContent = (
     <span className="text-[#fff8de] text-xl flex items-center px-8" style={{ fontFamily: 'Anta-Regular, monospace' }}>
       Decoding 1 OF ? 
