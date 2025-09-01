@@ -9,7 +9,7 @@ export async function POST(request) {
     const formData = await request.formData();
     let data = Object.fromEntries(formData);
     data = new LoginModel(data);
-    //validate the data
+
     let validationError = data.validateSync();
     if (validationError) {
       return NextResponse.json(
@@ -22,7 +22,7 @@ export async function POST(request) {
     }
     await dbConnect();
 
-    //check for the team
+
     const team = await LoginModel.findOne({ teamID: data.teamID }).exec();
     const isAuthenticated =
       team && (await checkPass(data.password, team.password));
@@ -34,6 +34,7 @@ export async function POST(request) {
     }
 
     await createSession(team.teamID);
+    console.log("Session created successfully for team:", team.teamID);
   } catch (error) {
     console.error("Login Action Error:", error);
     return NextResponse.json(

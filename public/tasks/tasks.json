@@ -4,67 +4,67 @@
       "id": 1,
       "title": "Task Number: 1",
       "description": "Submit the correct clues to guide the sprite through the maze. Each correct answer moves the sprite one step closer to the exit. Can you solve all the riddles and reach the end?",
-      "correctAnswers": ["start", "begin", "first", "initial"]
+      "correctAnswer": "start"
     },
     {
       "id": 2,
       "title": "Task Number: 2", 
       "description": "The sprite has progressed deeper into the maze. Unlock the next passage by discovering the secret keyword hidden in the ancient symbols.",
-      "correctAnswers": ["key", "secret", "unlock", "passage"]
+      "correctAnswer": "key"
     },
     {
       "id": 3,
       "title": "Task Number: 3",
       "description": "You're making excellent progress! The path ahead requires knowledge of encryption. What method is used to hide messages in plain sight?",
-      "correctAnswers": ["code", "cipher", "encrypt", "hidden"]
+      "correctAnswer": "code"
     },
     {
       "id": 4,
       "title": "Task Number: 4",
       "description": "The maze grows more complex. Ancient riddles block your way. What do you call a problem designed to test ingenuity?",
-      "correctAnswers": ["puzzle", "riddle", "enigma", "challenge"]
+      "correctAnswer": "puzzle"
     },
     {
       "id": 5,
       "title": "Task Number: 5",
       "description": "Halfway through your journey! The walls whisper of hidden truths. What reveals what was once concealed?",
-      "correctAnswers": ["mystery", "reveal", "discover", "uncover"]
+      "correctAnswer": "mystery"
     },
     {
       "id": 6,
       "title": "Task Number: 6",
       "description": "The sprite glows brighter as you near the deeper chambers. What do explorers seek in uncharted territories?",
-      "correctAnswers": ["treasure", "discovery", "find", "quest"]
+      "correctAnswer": "treasure"
     },
     {
       "id": 7,
       "title": "Task Number: 7",
       "description": "Ancient mechanisms activate around you. What opens when the correct sequence is entered?",
-      "correctAnswers": ["lock", "door", "gate", "portal"]
+      "correctAnswer": "lock"
     },
     {
       "id": 8,
       "title": "Task Number: 8",
       "description": "The maze's energy intensifies. What guides travelers through unknown paths?",
-      "correctAnswers": ["map", "guide", "compass", "path"]
+      "correctAnswer": "map"
     },
     {
       "id": 9,
       "title": "Task Number: 9",
       "description": "Almost there! The final chambers await. What marks the conclusion of a great journey?",
-      "correctAnswers": ["end", "finish", "complete", "final"]
+      "correctAnswer": "end"
     },
     {
       "id": 10,
       "title": "Task Number: 10",
       "description": "The last challenge approaches. What do victorious heroes claim at journey's end?",
-      "correctAnswers": ["victory", "triumph", "success", "win"]
+      "correctAnswer": "victory"
     },
     {
       "id": 11,
       "title": "Task Number: 11",
       "description": "The final step! The maze's heart pulses with ancient power. What word completes all journeys?",
-      "correctAnswers": ["exit", "escape", "freedom", "done"]
+      "correctAnswer": "exit"
     }
   ]
 }
