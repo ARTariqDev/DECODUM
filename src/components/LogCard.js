@@ -1,9 +1,26 @@
 import React from "react";
 
 const LogCard = ({ title, date, desc, onView }) => {
+ 
+  const getPreviewText = (text) => {
+    const jumbleText = (str) => {
+      const chars = str.split('');
+      for (let i = chars.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [chars[i], chars[j]] = [chars[j], chars[i]];
+      }
+      return chars.join('');
+    };
+
+    // Literally had to create our own templating language for this 🥀
+    return text.replace(/\[HIDDEN\].*?\[\/HIDDEN\]/g, '') //hides text
+               .replace(/\[BLUR\].*?\[\/BLUR\]/g, '') //blurs text (if ever needed)
+               .replace(/\[SCRAMBLE\](.*?)\[\/SCRAMBLE\]/g, (match, content) => jumbleText(content)); //scrambles text
+  };
+
   return (
     <div
-      className="w-[90%] max-w-3xl border border-[#fff8de]/30 rounded-2xl p-5 mb-6 
+      className="w-[90%] max-w-3xl border border-[#fff8de]/30 rounded-2xl p-5 mb-6
       backdrop-blur-sm text-[#fff8de] flex flex-col justify-between hover:shadow-[0_0_12px_#fff8de] 
       transition-all"
       style={{
@@ -39,7 +56,7 @@ const LogCard = ({ title, date, desc, onView }) => {
             textOverflow: "ellipsis",
           }}
         >
-          {desc}
+          {getPreviewText(desc)}
         </div>
       </div>
 

@@ -95,6 +95,78 @@ body {
   }
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hiddenReveal {
+  from {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: rgba(0, 0, 0, 0.8);
+  }
+  to {
+    background-color: rgba(255, 248, 222, 0.2);
+    color: rgba(255, 248, 222, 1);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-hiddenReveal {
+  animation: hiddenReveal 0.8s ease-out forwards;
+}
+
+/* Custom selection colors for hidden content */
+::selection {
+  background-color: rgba(255, 248, 222, 0.4);
+  color: rgba(255, 248, 222, 1);
+  text-shadow: 0 0 2px rgba(255, 248, 222, 0.8);
+}
+
+::-moz-selection {
+  background-color: rgba(255, 248, 222, 0.4);
+  color: rgba(255, 248, 222, 1);
+  text-shadow: 0 0 2px rgba(255, 248, 222, 0.8);
+}
+
+/* Hidden content styling */
+.hidden-content {
+  color: transparent !important;
+  background: transparent !important;
+  user-select: text;
+}
+
+.hidden-content::selection {
+  color: rgba(255, 248, 222, 1) !important;
+  background-color: rgba(255, 248, 222, 0.4) !important;
+  text-shadow: 0 0 2px rgba(255, 248, 222, 0.8) !important;
+}
+
+.hidden-content::-moz-selection {
+  color: rgba(255, 248, 222, 1) !important;
+  background-color: rgba(255, 248, 222, 0.4) !important;
+  text-shadow: 0 0 2px rgba(255, 248, 222, 0.8) !important;
+}
+
+/* Scrambled content styling */
+.scrambled-content {
+  color: rgba(255, 248, 222, 0.5) !important;
+  font-family: monospace;
+  letter-spacing: 1px;
+  background-color: rgba(255, 248, 222, 0.1);
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
 html, body, button, a, input, textarea {
   cursor: url('/cursor.svg') 10 10, auto !important;
 }
