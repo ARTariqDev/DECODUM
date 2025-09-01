@@ -167,6 +167,12 @@ body {
   border-radius: 2px;
 }
 
+/* Blurred content styling */
+.blurred-content {
+  filter: blur(4px);
+  user-select: text;
+}
+
 html, body, button, a, input, textarea {
   cursor: url('/cursor.svg') 10 10, auto !important;
 }

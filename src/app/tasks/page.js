@@ -15,10 +15,12 @@ const Tasks = () => {
   const [feedback, setFeedback] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [pendingMovement, setPendingMovement] = useState(false);
+  const [mazeCompleted, setMazeCompleted] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
+  const [teamName, setTeamName] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Load tasks from JSON file
   useEffect(() => {
     const loadTasks = async () => {
       try {
@@ -27,7 +29,7 @@ const Tasks = () => {
         setTasks(data.tasks);
       } catch (error) {
         console.error('Error loading tasks:', error);
-        // Fallback task if JSON loading fails
+        // Fallback task if JSON loading fails (for testing that the json file was working)
         setTasks([{
           id: 1,
           title: "Default Task",
@@ -37,20 +39,46 @@ const Tasks = () => {
       }
     };
 
+    const checkAuth = async () => {
+      try {
+
+        const response = await fetch('/api/auth', {
+          method: 'GET',
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setTeamName(data.teamId);
+          setIsAuthenticated(true);
+ 
+          setMazeProgress(data.mazeProgress || 0);
+          setCurrentTaskIndex(data.currentTaskIndex || 0);
+        } else {
+  
+          window.location.href = '/login';
+        }
+      } catch (error) {
+        console.error('Error checking authentication:', error);
+        window.location.href = '/login';
+      }
+    };
+
     loadTasks();
+    checkAuth();
   }, []);
 
-  // Get current task based on progress
+
   const currentTask = tasks[currentTaskIndex] || tasks[0];
 
   const handleMoveComplete = useCallback((step, isCompleted) => {
     if (isCompleted && step === 11) {
       console.log("Maze completed!");
+      setMazeCompleted(true);
+      setShowModal(false);
     }
   }, []);
 
   const openModal = () => {
-    if (!pendingMovement) {
+    if (!pendingMovement && isAuthenticated) {
       setShowModal(true);
       setCurrentClue("");
       setFeedback("");
@@ -63,40 +91,84 @@ const Tasks = () => {
     setFeedback("");
   };
 
-  const handleSubmitClue = () => {
-    if (!currentTask || !currentTask.correctAnswers) return;
+  const handleSubmitClue = async () => {
+    if (!currentTask || !currentTask.correctAnswers || !isAuthenticated) return;
 
     const userAnswer = currentClue.toLowerCase().trim();
-    const correctAnswers = currentTask.correctAnswers.map(answer => answer.toLowerCase().trim());
+    const hashedAnswers = currentTask.correctAnswers;
 
-    if (correctAnswers.includes(userAnswer)) {
-      setIsClueCorrect(true);
-      setFeedback("Correct! Moving sprite...");
-      setPendingMovement(true);
+    try {
+
+      const response = await fetch('/api/check-answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          userAnswer, 
+          hashedAnswers
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.correct) {
+        setIsClueCorrect(true);
+        setFeedback("Correct! Moving sprite...");
+        setPendingMovement(true);
 
 
-      const newProgress = mazeProgress + 1;
-      setMazeProgress(newProgress);
-      
+        const newMazeProgress = result.newMazeProgress;
+        const newTaskIndex = result.newTaskIndex;
+        
+        setMazeProgress(newMazeProgress);
+        
 
-      if (currentTaskIndex < tasks.length - 1) {
-        setCurrentTaskIndex(currentTaskIndex + 1);
+        if (newTaskIndex < tasks.length) {
+          setCurrentTaskIndex(newTaskIndex);
+        }
+
+        setTimeout(() => {
+          setPendingMovement(false);
+          closeModal();
+        }, 2000);
+      } else {
+        setIsClueCorrect(false);
+        setFeedback(result.message || "Incorrect clue. Try again!");
       }
-
-
-      setTimeout(() => {
-        setPendingMovement(false);
-        closeModal();
-      }, 2000);
-    } else {
-      setIsClueCorrect(false);
-      setFeedback("Incorrect clue. Try again!");
+    } catch (error) {
+      console.error('Error checking answer:', error);
+      setFeedback("Error checking answer. Please try again.");
     }
   };
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <Navbar />
+
+
+      {mazeCompleted && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
+          <div className="bg-gray-900 border border-green-500 rounded-lg p-8 max-w-md mx-4 text-center">
+            <div className="text-6xl mb-4">🎉</div>
+            <h2 className="text-3xl font-bold text-green-400 mb-4">Congratulations!</h2>
+            <p className="text-gray-300 mb-6">
+              You have successfully completed the maze challenge!
+            </p>
+            <p className="text-yellow-400 mb-6">
+              Team: {teamName}
+            </p>
+            <Button
+              text="Return to Start"
+              glowColor="#00ff88"
+              className="w-full"
+              onClick={() => {
+                setMazeCompleted(false);
+                setMazeProgress(0);
+                setCurrentTaskIndex(0);
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       <main className="flex-1 flex flex-col lg:block px-4 pt-2 lg:pt-20 pb-2 lg:pb-4 overflow-hidden mt-[4rem]">
         
@@ -217,7 +289,7 @@ const Tasks = () => {
                   
                   <div className="flex justify-center">
                     <Button
-                      text="Submit Clue"
+                      text="Click to Enter Answer"
                       glowColor="#fff8de"
                       className="px-8 py-3"
                       textSize="text-base"

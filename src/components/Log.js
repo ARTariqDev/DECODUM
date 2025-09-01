@@ -2,22 +2,34 @@ import React from "react";
 
 const Log = ({ title, date, desc }) => {
 
+  const jumbleText = (str) => {
+    const chars = str.split('');
+    for (let i = chars.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [chars[i], chars[j]] = [chars[j], chars[i]];
+    }
+    return chars.join('');
+  };
+
   const parseDescription = (text) => {
     if (!text) return '';
 
-    const jumbleText = (str) => {
-      const chars = str.split('');
-      for (let i = chars.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [chars[i], chars[j]] = [chars[j], chars[i]];
-      }
-      return chars.join('');
-    };
-    
-    // Replace [HIDDEN]content[/HIDDEN] tags with just the content wrapped in transparent span
-    // This removes the tag whitespace while keeping the content (cause the white space made it way too obvious)
     return text.replace(/\[HIDDEN\](.*?)\[\/HIDDEN\]/g, '<span class="hidden-content">$1</span>')
-               .replace(/\[SCRAMBLE\](.*?)\[\/SCRAMBLE\]/g, (match, content) => `<span class="scrambled-content">${jumbleText(content)}</span>`);
+               .replace(/\[SCRAMBLE\](.*?)\[\/SCRAMBLE\]/g, (match, content) => `<span class="scrambled-content">${jumbleText(content)}</span>`)
+               .replace(/\[BLUR\](.*?)\[\/BLUR\]/g, '<span class="blurred-content">$1</span>');
+  };
+
+  const parseTitle = (text) => {
+    if (!text) return '';
+    
+
+    return text.replace(/\[HIDDEN\].*?\[\/HIDDEN\]/g, '') // Remove hidden content from titles
+               .replace(/\[SCRAMBLE\](.*?)\[\/SCRAMBLE\]/g, (match, content) => jumbleText(content)) // Scramble content
+               .replace(/\[BLUR\](.*?)\[\/BLUR\]/g, '<span class="blurred-content">$1</span>'); // Wrap blur content in span
+  };
+
+  const hasBlueTags = (text) => {
+    return /\[BLUR\].*?\[\/BLUR\]/g.test(text);
   };
 
   return (
@@ -36,9 +48,8 @@ const Log = ({ title, date, desc }) => {
           WebkitTextFillColor: "transparent",
           textShadow: "0 0 8px #fff8de",
         }}
-      >
-        {title}
-      </h1>
+        dangerouslySetInnerHTML={{ __html: parseTitle(title) }}
+      />
 
       <p className="text-sm md:text-base text-[#fff8de]/70 mb-6 text-center md:text-left">
         {date}

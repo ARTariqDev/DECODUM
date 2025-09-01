@@ -1,21 +1,43 @@
 import React from "react";
 
 const LogCard = ({ title, date, desc, onView }) => {
- 
-  const getPreviewText = (text) => {
-    const jumbleText = (str) => {
-      const chars = str.split('');
-      for (let i = chars.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [chars[i], chars[j]] = [chars[j], chars[i]];
-      }
-      return chars.join('');
-    };
+  
+  const jumbleText = (str) => {
+    const chars = str.split('');
+    for (let i = chars.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [chars[i], chars[j]] = [chars[j], chars[i]];
+    }
+    return chars.join('');
+  };
 
-    // Literally had to create our own templating language for this 🥀
-    return text.replace(/\[HIDDEN\].*?\[\/HIDDEN\]/g, '') //hides text
-               .replace(/\[BLUR\].*?\[\/BLUR\]/g, '') //blurs text (if ever needed)
-               .replace(/\[SCRAMBLE\](.*?)\[\/SCRAMBLE\]/g, (match, content) => jumbleText(content)); //scrambles text
+  const processText = (text, showBlurred = false) => {
+    if (!text) return '';
+    
+    let processedText = text.replace(/\[HIDDEN\].*?\[\/HIDDEN\]/g, '') //hides text
+                          .replace(/\[SCRAMBLE\](.*?)\[\/SCRAMBLE\]/g, (match, content) => jumbleText(content)); //scrambles text
+    
+    if (showBlurred) {
+      // For titles, wrap blurred content in span
+      processedText = processedText.replace(/\[BLUR\](.*?)\[\/BLUR\]/g, '<span class="blurred-content">$1</span>');
+    } else {
+      // For descriptions, remove blurred content in preview
+      processedText = processedText.replace(/\[BLUR\].*?\[\/BLUR\]/g, ''); //remove blurred content in preview
+    }
+    
+    return processedText;
+  };
+
+  const getPreviewText = (text) => {
+    return processText(text, false);
+  };
+
+  const getTitleText = (text) => {
+    return processText(text, true);
+  };
+
+  const hasBlueTags = (text) => {
+    return /\[BLUR\].*?\[\/BLUR\]/g.test(text);
   };
 
   return (
@@ -37,9 +59,8 @@ const LogCard = ({ title, date, desc, onView }) => {
             WebkitTextFillColor: "transparent",
             textShadow: "0 0 6px #fff8de",
           }}
-        >
-          {title}
-        </h2>
+          dangerouslySetInnerHTML={{ __html: getTitleText(title) }}
+        />
         <span className="text-sm text-[#fff8de]/70">{date}</span>
 
 

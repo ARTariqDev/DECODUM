@@ -15,6 +15,16 @@ const loginSchema = new Schema({
     min: [0, "Score cannot be negative"],
     default: 0,
   },
+  mazeProgress: {
+    type: Number,
+    min: [0, "Maze progress cannot be negative"],
+    default: 0,
+  },
+  currentTaskIndex: {
+    type: Number,
+    min: [0, "Task index cannot be negative"],
+    default: 0,
+  },
 });
 
 export default mongoose.models.Login || mongoose.model("Login", loginSchema);
