@@ -2,6 +2,7 @@ import { dbConnect } from "@/lib/dbConnect";
 import LoginModel from "@/models/login";
 import { createSession } from "@/lib/session";
 import { NextResponse } from "next/server";
+import { checkPass } from "@/lib/hasher";
 
 export async function POST(request) {
   try {
@@ -23,7 +24,9 @@ export async function POST(request) {
 
     //check for the team
     const team = await LoginModel.findOne({ teamID: data.teamID }).exec();
-    if (!team || team.password !== data.password) {
+    const isAuthenticated =
+      team && (await checkPass(data.password, team.password));
+    if (!isAuthenticated) {
       return NextResponse.json(
         { message: "Invalid Team Id or Password!" },
         { status: 401 }
