@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { verifyJWT } from "@/lib/session";
 
 
-const protectedRoutes = ["/tasks"];
+const protectedRoutes = ["/tasks","/logs"];
 
 const publicRoutes = ["/login"];
 
