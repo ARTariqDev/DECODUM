@@ -38,7 +38,7 @@ export async function verifyJWT(session) {
   }
 }
 
-// in case we ever want to log out
+// in case we want to log out
 export async function deleteSession() {
   const c = await cookies();
   c.delete("session");
