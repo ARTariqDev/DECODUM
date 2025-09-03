@@ -7,7 +7,7 @@ function Footer() {
     "All rights Reserved",
     "⚬",
     // eslint-disable-next-line react/jsx-key
-    <section className="flex flex-wrap justify-center gap-1 text-xs sm:text-sm">
+    <section className="flex flex-wrap justify-center gap-1 text-xs sm:text-sm ">
       Made By:{" "}
       <Link
         href="https://github.com/ARTariqDev"
@@ -34,7 +34,7 @@ function Footer() {
   ];
 
   return (
-    <footer className="w-full bg-[#111111]/80 py-3 sm:py-4 px-4 border-t border-[#fff8de]/20 relative backdrop-blur-sm overflow-hidden text-center">
+    <footer className="w-full bg-[#111111]/80 py-3 sm:py-4 px-4 border-t border-[#fff8de]/20 relative backdrop-blur-sm overflow-hidden text-center mt-[2rem]">
 
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,248,222,0.05)_25%,rgba(255,248,222,0.05)_50%,transparent_50%,transparent_75%,rgba(255,248,222,0.05)_75%)] bg-[length:20px_20px] animate-pulse"></div>

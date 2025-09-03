@@ -36,11 +36,20 @@ export async function GET() {
       );
     }
 
+    // Convert Map to object for JSON response
+    const answers = {};
+    if (team.taskAnswers) {
+      team.taskAnswers.forEach((value, key) => {
+        answers[key] = value;
+      });
+    }
+
     return NextResponse.json({
       teamId: payload.TeamId,
       authenticated: true,
       mazeProgress: team.mazeProgress || 0,
-      currentTaskIndex: team.currentTaskIndex || 0
+      currentTaskIndex: team.currentTaskIndex || 0,
+      taskAnswers: answers
     });
   } catch (error) {
     console.error('Error verifying session:', error);

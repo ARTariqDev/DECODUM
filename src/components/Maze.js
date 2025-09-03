@@ -479,7 +479,7 @@ const Maze = ({ onMoveComplete, currentStep = 0, totalSteps = 11 }) => {
   }, [game, isReady]);
 
   return (
-    <div className="flex justify-center w-full">
+    <div className="flex justify-center w-full mt-[2rem]">
       <div 
         ref={gameRef} 
         className="border-2 border-[#e6d8a3] rounded-lg bg-black"

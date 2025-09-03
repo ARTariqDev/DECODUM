@@ -10,16 +10,15 @@ import Footer from "@/components/Footer";
 const Tasks = () => {
   const [showDescription, setShowDescription] = useState(true);
   const [mazeProgress, setMazeProgress] = useState(0);
-  const [currentClue, setCurrentClue] = useState("");
-  const [isClueCorrect, setIsClueCorrect] = useState(false);
-  const [feedback, setFeedback] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [pendingMovement, setPendingMovement] = useState(false);
+  const [currentAnswer, setCurrentAnswer] = useState("");
   const [mazeCompleted, setMazeCompleted] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
   const [teamName, setTeamName] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [taskAnswers, setTaskAnswers] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const loadTasks = async () => {
@@ -29,7 +28,7 @@ const Tasks = () => {
         setTasks(data.tasks);
       } catch (error) {
         console.error('Error loading tasks:', error);
-        // Fallback task if JSON loading fails (for testing that the json file was working)
+        // Fallback task if JSON loading fails
         setTasks([{
           id: 1,
           title: "Default Task",
@@ -41,7 +40,6 @@ const Tasks = () => {
 
     const checkAuth = async () => {
       try {
-
         const response = await fetch('/api/auth', {
           method: 'GET',
         });
@@ -49,11 +47,15 @@ const Tasks = () => {
           const data = await response.json();
           setTeamName(data.teamId);
           setIsAuthenticated(true);
- 
           setMazeProgress(data.mazeProgress || 0);
           setCurrentTaskIndex(data.currentTaskIndex || 0);
+          setTaskAnswers(data.taskAnswers || {});
+          
+          // Set maze completed if progress is 11
+          if (data.mazeProgress >= 11) {
+            setMazeCompleted(true);
+          }
         } else {
-  
           window.location.href = '/login';
         }
       } catch (error) {
@@ -66,6 +68,13 @@ const Tasks = () => {
     checkAuth();
   }, []);
 
+  // Update current answer when task changes
+  useEffect(() => {
+    const currentTask = tasks[currentTaskIndex];
+    if (currentTask) {
+      setCurrentAnswer(taskAnswers[currentTask.id] || "");
+    }
+  }, [currentTaskIndex, taskAnswers, tasks]);
 
   const currentTask = tasks[currentTaskIndex] || tasks[0];
 
@@ -73,77 +82,95 @@ const Tasks = () => {
     if (isCompleted && step === 11) {
       console.log("Maze completed!");
       setMazeCompleted(true);
-      setShowModal(false);
     }
   }, []);
 
-  const openModal = () => {
-    if (!pendingMovement && isAuthenticated) {
-      setShowModal(true);
-      setCurrentClue("");
-      setFeedback("");
-    }
-  };
+  const saveAnswer = async () => {
+    if (!currentTask || !isAuthenticated) return;
 
-  const closeModal = () => {
-    setShowModal(false);
-    setCurrentClue("");
-    setFeedback("");
-  };
-
-  const handleSubmitClue = async () => {
-    if (!currentTask || !currentTask.correctAnswers || !isAuthenticated) return;
-
-    const userAnswer = currentClue.toLowerCase().trim();
-    const hashedAnswers = currentTask.correctAnswers;
-
+    setIsSaving(true);
+    
     try {
-
-      const response = await fetch('/api/check-answer', {
+      const response = await fetch('/api/task-answers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          userAnswer, 
-          hashedAnswers
+          taskId: currentTask.id, 
+          answer: currentAnswer
         })
       });
 
       const result = await response.json();
 
-      if (result.correct) {
-        setIsClueCorrect(true);
-        setFeedback("Correct! Moving sprite...");
-        setPendingMovement(true);
-
-
-        const newMazeProgress = result.newMazeProgress;
-        const newTaskIndex = result.newTaskIndex;
+      if (response.ok) {
+        setTaskAnswers(result.taskAnswers);
+        setMazeProgress(result.mazeProgress);
         
-        setMazeProgress(newMazeProgress);
-        
-
-        if (newTaskIndex < tasks.length) {
-          setCurrentTaskIndex(newTaskIndex);
+        // Check if maze is completed
+        if (result.mazeProgress >= 11) {
+          setMazeCompleted(true);
         }
-
-        setTimeout(() => {
-          setPendingMovement(false);
-          closeModal();
-        }, 2000);
+        
+        setIsEditing(false);
       } else {
-        setIsClueCorrect(false);
-        setFeedback(result.message || "Incorrect clue. Try again!");
+        console.error('Error saving answer:', result.error);
       }
     } catch (error) {
-      console.error('Error checking answer:', error);
-      setFeedback("Error checking answer. Please try again.");
+      console.error('Error saving answer:', error);
+    } finally {
+      setIsSaving(false);
     }
   };
+
+  const clearAnswer = async () => {
+    if (!currentTask || !isAuthenticated) return;
+
+    setIsSaving(true);
+    
+    try {
+      const response = await fetch('/api/task-answers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          taskId: currentTask.id, 
+          answer: ""
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setTaskAnswers(result.taskAnswers);
+        setMazeProgress(result.mazeProgress);
+        setCurrentAnswer("");
+        
+        // Update maze completed status
+        setMazeCompleted(result.mazeProgress >= 11);
+        
+        setIsEditing(false);
+      } else {
+        console.error('Error clearing answer:', result.error);
+      }
+    } catch (error) {
+      console.error('Error clearing answer:', error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const navigateToTask = (direction) => {
+    if (direction === 'next' && currentTaskIndex < tasks.length - 1) {
+      setCurrentTaskIndex(currentTaskIndex + 1);
+    } else if (direction === 'prev' && currentTaskIndex > 0) {
+      setCurrentTaskIndex(currentTaskIndex - 1);
+    }
+  };
+
+  const hasAnswer = currentTask && taskAnswers[currentTask.id];
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <Navbar />
-
 
       {mazeCompleted && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
@@ -162,7 +189,6 @@ const Tasks = () => {
               className="w-full"
               onClick={() => {
                 setMazeCompleted(false);
-                setMazeProgress(0);
                 setCurrentTaskIndex(0);
               }}
             />
@@ -170,15 +196,13 @@ const Tasks = () => {
         </div>
       )}
 
-      <main className="flex-1 flex flex-col lg:block px-4 pt-2 lg:pt-20 pb-2 lg:pb-4 overflow-hidden mt-[4rem]">
+      <main className="flex-1 flex flex-col lg:block px-2 lg:px-4 pt-2 lg:pt-4 pb-2 lg:pb-4 overflow-hidden mt-[4rem]">
         
         {/* Mobile Layout */}
         <div className="lg:hidden flex flex-col h-full">
-          
-
-          <div className="h-[40vh] flex items-center justify-center">
+          <div className="h-[35vh] flex items-center justify-center mb-8">
             <div className="w-full max-w-[90vw] h-full flex items-center justify-center">
-              <div style={{ transform: 'scale(0.6)' }}>
+              <div style={{ transform: 'scale(0.55)' }}>
                 <Maze 
                   currentStep={mazeProgress} 
                   totalSteps={11} 
@@ -188,13 +212,36 @@ const Tasks = () => {
             </div>
           </div>
 
+          <div className="h-[1vh]"></div>
 
-          <div className="h-[2vh]"></div>
+          <div className="h-[55vh] overflow-y-auto space-y-2 px-2">
+            {/* Task Navigation */}
+            <div className="bg-[#111111] border border-gray-600 rounded-lg p-3">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-semibold text-[#e6d8a3]">Task Navigation</h3>
+                <span className="text-xs text-gray-400">
+                  {currentTaskIndex + 1} of {tasks.length}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => navigateToTask('prev')}
+                  disabled={currentTaskIndex === 0}
+                  className="flex-1 px-3 py-2 rounded bg-gray-800 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700"
+                >
+                  ← Previous
+                </button>
+                <button
+                  onClick={() => navigateToTask('next')}
+                  disabled={currentTaskIndex >= tasks.length - 1}
+                  className="flex-1 px-3 py-2 rounded bg-gray-800 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700"
+                >
+                  Next →
+                </button>
+              </div>
+            </div>
 
-
-          <div className="h-[45vh] overflow-y-auto space-y-3 px-2">
-            
-
+            {/* Task Description */}
             <div className="bg-[#111111] border border-[#e6d8a3] rounded-lg p-3">
               {currentTask && (
                 <TaskDescription
@@ -206,33 +253,69 @@ const Tasks = () => {
               )}
             </div>
 
-
+            {/* Answer Section */}
             <div className="bg-[#111111] border border-gray-600 rounded-lg p-3">
               <div className="text-center space-y-2">
-                <h3 className="text-sm font-semibold text-[#e6d8a3]">Submit Your Answer</h3>
-                <p className="text-gray-400 text-xs">
-                  Enter the correct clue to advance the sprite
-                </p>
+                <h3 className="text-sm font-semibold text-[#e6d8a3]">Your Answer</h3>
                 
-                <div className="flex justify-center">
-                  <Button
-                    text="Submit Clue"
-                    glowColor="#fff8de"
-                    className="px-4 py-2"
-                    textSize="text-xs"
-                    onClick={openModal}
-                  />
-                </div>
-
-                <div className="pt-2 border-t border-gray-700">
-                  <p className="text-gray-500 text-xs">
-                    Hint: Read the task description carefully for clues...
-                  </p>
-                </div>
+                {hasAnswer && !isEditing ? (
+                  <div className="space-y-2">
+                    <p className="text-xs text-gray-400">Current answer:</p>
+                    <div className="bg-gray-800 p-2 rounded text-xs text-gray-300 max-h-20 overflow-y-auto whitespace-pre-wrap text-left">
+                      {taskAnswers[currentTask.id]}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        text="Edit"
+                        glowColor="#fff8de"
+                        className="flex-1 py-2"
+                        textSize="text-xs"
+                        onClick={() => setIsEditing(true)}
+                      />
+                      <button
+                        onClick={clearAnswer}
+                        disabled={isSaving}
+                        className="flex-1 px-3 py-2 rounded bg-red-600 text-white text-xs hover:bg-red-700 disabled:opacity-50"
+                      >
+                        {isSaving ? 'Clearing...' : 'Clear'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <textarea
+                      value={currentAnswer}
+                      onChange={(e) => setCurrentAnswer(e.target.value)}
+                      placeholder="Enter your answer here... You can write sentences, paragraphs, or any text."
+                      className="w-full px-3 py-2 rounded-lg border border-[#fff8de] focus:border-[#e6d8a3] bg-black text-white placeholder-gray-400 focus:outline-none transition-colors resize-vertical min-h-[80px] text-xs"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        text={isSaving ? 'Saving...' : 'Save Answer'}
+                        glowColor="#fff8de"
+                        className="flex-1 py-2"
+                        textSize="text-xs"
+                        onClick={saveAnswer}
+                        disabled={isSaving || !currentAnswer.trim()}
+                      />
+                      {hasAnswer && (
+                        <button
+                          onClick={() => {
+                            setCurrentAnswer(taskAnswers[currentTask.id] || "");
+                            setIsEditing(false);
+                          }}
+                          className="flex-1 px-3 py-2 rounded bg-gray-700 text-white text-xs hover:bg-gray-600"
+                        >
+                          Cancel
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-
+            {/* Progress Bar */}
             <div className="bg-[#111111] border border-gray-600 rounded-lg p-2">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs text-gray-400">Progress</span>
@@ -252,11 +335,9 @@ const Tasks = () => {
 
         {/* Desktop Layout */}
         <div className="hidden lg:block max-w-7xl mx-auto h-full">
-          <div className="grid lg:grid-cols-2 gap-8 h-full items-start">
-            
-
-            <div className="flex justify-center order-1 lg:order-1">
-              <div className="w-full max-w-[500px]">
+          <div className="grid lg:grid-cols-2 gap-4 h-full">
+            <div className="flex justify-center items-center order-1 lg:order-1">
+              <div className="w-full max-w-[450px]">
                 <Maze 
                   currentStep={mazeProgress} 
                   totalSteps={11} 
@@ -265,11 +346,36 @@ const Tasks = () => {
               </div>
             </div>
 
+            <div className="space-y-3 order-2 lg:order-2 overflow-y-auto pr-2 mt-8" style={{ maxHeight: 'calc(100vh - 8rem)' }}>
+              {/* Task Navigation */}
+              {/* Task Navigation */}
+              <div className="bg-[#111111] border border-gray-600 rounded-lg p-2">
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-sm font-semibold text-[#e6d8a3]">Task Navigation</h3>
+                  <span className="text-xs text-gray-400">
+                    {currentTaskIndex + 1} of {tasks.length}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => navigateToTask('prev')}
+                    disabled={currentTaskIndex === 0}
+                    className="flex-1 px-2 py-1 rounded bg-gray-800 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700"
+                  >
+                    ← Previous
+                  </button>
+                  <button
+                    onClick={() => navigateToTask('next')}
+                    disabled={currentTaskIndex >= tasks.length - 1}
+                    className="flex-1 px-2 py-1 rounded bg-gray-800 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700"
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
 
-            <div className="space-y-6 order-2 lg:order-2">
-              
-
-              <div className="bg-[#111111] border border-[#e6d8a3] rounded-lg p-6">
+              {/* Task Description */}
+              <div className="bg-[#111111] border border-[#e6d8a3] rounded-lg p-2">
                 {currentTask && (
                   <TaskDescription
                     task={currentTask.title}
@@ -280,146 +386,89 @@ const Tasks = () => {
                 )}
               </div>
 
-              <div className="bg-[#111111] border border-gray-600 rounded-lg p-6">
-                <div className="text-center space-y-4">
-                  <h3 className="text-lg font-semibold text-[#e6d8a3]">Submit Your Answer</h3>
-                  <p className="text-gray-400 text-sm">
-                    Enter the correct clue to advance the sprite
-                  </p>
+              {/* Answer Section */}
+              <div className="bg-[#111111] border border-gray-600 rounded-lg p-2">
+                <div className="text-center space-y-2">
+                  <h3 className="text-sm font-semibold text-[#e6d8a3]">Your Answer</h3>
                   
-                  <div className="flex justify-center">
-                    <Button
-                      text="Click to Enter Answer"
-                      glowColor="#fff8de"
-                      className="px-8 py-3"
-                      textSize="text-base"
-                      onClick={openModal}
-                    />
-                  </div>
-
-                  <div className="pt-4 border-t border-gray-700">
-                    <p className="text-gray-500 text-xs">
-                      Hint: Read the task description carefully for clues...
-                    </p>
-                  </div>
+                  {hasAnswer && !isEditing ? (
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-400">Current answer:</p>
+                      <div className="bg-gray-800 p-2 rounded text-gray-300 text-left whitespace-pre-wrap text-xs max-h-24 overflow-y-auto">
+                        {taskAnswers[currentTask.id]}
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          text="Edit"
+                          glowColor="#fff8de"
+                          className="flex-1 py-1"
+                          textSize="text-xs"
+                          onClick={() => setIsEditing(true)}
+                        />
+                        <button
+                          onClick={clearAnswer}
+                          disabled={isSaving}
+                          className="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 text-xs"
+                        >
+                          {isSaving ? 'Clearing...' : 'Clear'}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <textarea
+                        value={currentAnswer}
+                        onChange={(e) => setCurrentAnswer(e.target.value)}
+                        placeholder="Enter your answer here..."
+                        className="w-full px-2 py-1 rounded-lg border-2 border-[#fff8de] focus:border-[#e6d8a3] bg-black text-white placeholder-gray-400 focus:outline-none transition-colors resize-vertical min-h-[60px] text-xs"
+                      />
+                      <div className="flex gap-1">
+                        <Button
+                          text={isSaving ? 'Saving...' : 'Save'}
+                          glowColor="#fff8de"
+                          className="flex-1 py-1"
+                          textSize="text-xs"
+                          onClick={saveAnswer}
+                          disabled={isSaving || !currentAnswer.trim()}
+                        />
+                        {hasAnswer && (
+                          <button
+                            onClick={() => {
+                              setCurrentAnswer(taskAnswers[currentTask.id] || "");
+                              setIsEditing(false);
+                            }}
+                            className="px-2 py-1 rounded bg-gray-700 text-white hover:bg-gray-600 text-xs"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="bg-[#111111] border border-gray-600 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-400">Progress</span>
-                  <span className="text-sm font-medium text-[#e6d8a3]">
+              {/* Progress Bar */}
+              <div className="bg-[#111111] border border-gray-600 rounded-lg p-2">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-gray-400">Progress</span>
+                  <span className="text-xs font-medium text-[#e6d8a3]">
                     {mazeProgress}/11
                   </span>
                 </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-gray-700 rounded-full h-1">
                   <div 
-                    className="bg-gradient-to-r from-[#e6d8a3] to-[#fff8de] h-2 rounded-full transition-all duration-500 ease-out"
+                    className="bg-gradient-to-r from-[#e6d8a3] to-[#fff8de] h-1 rounded-full transition-all duration-500 ease-out"
                     style={{ width: `${(mazeProgress / 11) * 100}%` }}
                   ></div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
       </main>
 
-
       <Footer />
-
-
-      {showModal && (
-        <div 
-          className="fixed inset-0 flex items-center justify-center z-50 px-4"
-          style={{
-            backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)'
-          }}
-        >
-          <div className="bg-[#111111] border-2 border-[#e6d8a3] rounded-lg p-6 w-full max-w-md relative">
-
-            <button
-              onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            <div className="mb-6">
-              <h3 className="text-xl font-bold text-[#e6d8a3] mb-2">Submit Your Clue</h3>
-              <p className="text-gray-300 text-sm">
-                Enter the correct clue to move the sprite forward in the maze
-              </p>
-            </div>
-
-            <div className="mb-4">
-              <input
-                type="text"
-                value={currentClue}
-                onChange={(e) => setCurrentClue(e.target.value)}
-                placeholder={pendingMovement ? "Correct answer submitted!" : "Enter your clue..."}
-                className={`w-full px-4 py-3 rounded-lg border-2 bg-black text-white placeholder-gray-400 focus:outline-none transition-colors ${
-                  pendingMovement 
-                    ? 'border-green-500 bg-green-900 bg-opacity-20' 
-                    : 'border-[#fff8de] focus:border-[#e6d8a3]'
-                }`}
-                onKeyPress={(e) => e.key === 'Enter' && !pendingMovement && handleSubmitClue()}
-                autoFocus={!pendingMovement}
-                disabled={pendingMovement}
-              />
-              {feedback && (
-                <p className={`mt-2 text-sm ${isClueCorrect ? 'text-green-500' : 'text-red-500'}`}>
-                  {feedback}
-                </p>
-              )}
-            </div>
-
-            <div className="flex gap-3">
-              {pendingMovement ? (
-
-                <div className="w-full">
-                  <Button
-                    text="Close"
-                    glowColor="#00ff88"
-                    className="w-full"
-                    textSize="text-sm"
-                    onClick={closeModal}
-                  />
-                </div>
-              ) : (
-
-                <>
-                  <button
-                    onClick={closeModal}
-                    className="flex-1 px-4 py-2 rounded-lg border border-gray-600 text-gray-300 hover:text-white hover:border-gray-500 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <div className="flex-1">
-                    <Button
-                      text="Submit"
-                      glowColor="#fff8de"
-                      className="w-full"
-                      textSize="text-sm"
-                      onClick={handleSubmitClue}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="mt-4 text-center">
-              <p className="text-gray-500 text-xs">
-                Tip: Read the task description carefully for clues...
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

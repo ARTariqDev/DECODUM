@@ -25,6 +25,11 @@ const loginSchema = new Schema({
     min: [0, "Task index cannot be negative"],
     default: 0,
   },
+  taskAnswers: {
+    type: Map,
+    of: String,
+    default: new Map(),
+  },
 });
 
 export default mongoose.models.Login || mongoose.model("Login", loginSchema);
