@@ -29,7 +29,7 @@ const LogCard = ({ title, date, desc, onView }) => {
   };
 
   const getPreviewText = (text) => {
-    return processText(text, false);
+    return processText(text, true); // Changed from false to true to show blurred content
   };
 
   const getTitleText = (text) => {
@@ -76,9 +76,8 @@ const LogCard = ({ title, date, desc, onView }) => {
             overflow: "hidden",
             textOverflow: "ellipsis",
           }}
-        >
-          {getPreviewText(desc)}
-        </div>
+          dangerouslySetInnerHTML={{ __html: getPreviewText(desc) }}
+        />
       </div>
 
       <button

@@ -3,120 +3,57 @@
     {
       "id": 1,
       "title": "Task Number: 1",
-      "description": "What is the writers name ?",
-      "correctAnswers": [
-        "$2b$10$XZSwl5DUXEJ3mLhsTjOvOefQ5odMpXZYBYBQ7CKladCMZoX5ASQAa"
-      ]
+      "description": "What is the writers name ?"
     },
     {
       "id": 2,
       "title": "Task Number: 2",
-      "description": "The sprite has progressed deeper into the maze. Unlock the next passage by discovering the secret keyword hidden in the ancient symbols.",
-      "correctAnswers": [
-        "$2b$10$/HohnOaArrvxyDOOuhlXa.L04GSJWYCmgkmzpLdzkwuhE3iI2hCXS",
-        "$2b$10$d1R6zYbZC0WF36VFmPP4XOxZ6LRtjgFub8NXdLmZd.eW5I/VEq9qu",
-        "$2b$10$uoaOP6XfU.jNBhP31.afYe5.EdpAl35OEW3.PkSbMngB992spfV66",
-        "$2b$10$88AD.hDrutsQAG6uMnxlR.p7wQrcfQJ1Pmv8jysuG0N9WHMaOX1Fa"
-      ]
+      "description": "Write a brief description of the relationship that the protagonist has with the person due to which he started writing this blog."
     },
     {
       "id": 3,
       "title": "Task Number: 3",
-      "description": "You're making excellent progress! The path ahead requires knowledge of encryption. What method is used to hide messages in plain sight?",
-      "correctAnswers": [
-        "$2b$10$kYUVYIZIomDAuMLqdz7jUu9hdzeNhqMBOoIRGTAVQuq4SRwAG2ad2",
-        "$2b$10$s6r5NeLl3Xb6obaQSWaCWOklt373yMaR8XUhIQLTLO8OwcmnL35N.",
-        "$2b$10$BwE8PodyzmZqc6y/64j3yu9DQHamBdlcSEN0D6LIjcqPVjnJdyMzy",
-        "$2b$10$aNRvk2tLeDxtptF8x/r7aOsDRJ22Rj4gmqYJXitxSuEAjz4reYEVu"
-      ]
+      "description": "You're making excellent progress! The path ahead requires knowledge of encryption. What method is used to hide messages in plain sight?"
     },
     {
       "id": 4,
       "title": "Task Number: 4",
-      "description": "The maze grows more complex. Ancient riddles block your way. What do you call a problem designed to test ingenuity?",
-      "correctAnswers": [
-        "$2b$10$SnEzJRTNlrZLe6lXT4jKPeLiJSh4b1ZUCbIzXkEl//hQG2K0z17je",
-        "$2b$10$wWsQOk4mrB5KavDArLJ3nuKnEHeNw6Z4qHMHa.BX9q60JQWUFuLp2",
-        "$2b$10$KmSGWHQkFp.i3zxuTBzI3etO/sp1uGe.VLQb.hCnWrC/my64QMH8K",
-        "$2b$10$WYkIOGLrsYg4XSXQu9eWZOCJI8sOHgdEATvGD6S74pksKnRNZY39e"
-      ]
+      "description": "The maze grows more complex. Ancient riddles block your way. What do you call a problem designed to test ingenuity?"
     },
     {
       "id": 5,
       "title": "Task Number: 5",
-      "description": "Halfway through your journey! The walls whisper of hidden truths. What reveals what was once concealed?",
-      "correctAnswers": [
-        "$2b$10$KWw5YRi9.zZwAIgqOcTk3.wd36NqdbiZsX2x71XVDCdGh1MMmO7am",
-        "$2b$10$06NcUz5gYlIPVIoBwpnvj.tJE3n.39VmNRvBSwDbpKSwxPujvk6Ja",
-        "$2b$10$QiMJy6qr8rsdllZyx1EXie0BfchUeIjKA0FNv0CHS3Bfcn1uTSo.G",
-        "$2b$10$Glq8cpFN42f38Ao0Bh5MlOxgOjwQRZ201X1SG4CprM1Hm9oB.L58q"
-      ]
+      "description": "Halfway through your journey! The walls whisper of hidden truths. What reveals what was once concealed?"
     },
     {
       "id": 6,
       "title": "Task Number: 6",
-      "description": "The sprite glows brighter as you near the deeper chambers. What do explorers seek in uncharted territories?",
-      "correctAnswers": [
-        "$2b$10$GOV9lakJpA0Ak9doVRMd7O/3tcAZPXnOSpa1pGtONA8I3VuqEqmR2",
-        "$2b$10$eWEvBKRRhZeMBgH6/hjRzOlpSXvGw0OK7xeRCQM4Lag6ba0wIpIMW",
-        "$2b$10$qfLy/kUvG./jNpyKE/uyeuozzS4/vuNxZ2xiQrS/IHOAjZiAC0lIq",
-        "$2b$10$vfQfAtL9uSGzIIM0L5v8Y.6sxMgwPf5FwPgU4ZnyyNO2/2C0V1gSC"
-      ]
+      "description": "The sprite glows brighter as you near the deeper chambers. What do explorers seek in uncharted territories?"
     },
     {
       "id": 7,
       "title": "Task Number: 7",
-      "description": "Ancient mechanisms activate around you. What opens when the correct sequence is entered?",
-      "correctAnswers": [
-        "$2b$10$OLC9eYcXBgZqAKSS/Soyv.ethqKZcNlXekllwts05P82t1CSUWOmG",
-        "$2b$10$iepnocDsQIgSPIhmElLQQuegS/432VKPrE7iV/t7n8q3noHddZpZK",
-        "$2b$10$Acb9Xax4oWEfeeD1A9FKPOA2t5CWy0qSEQHUIq87ZMuzVjuGuvhMu",
-        "$2b$10$dAl86ZWsIjFAiz0Nze15l.kz2Unq6Qkn703zu93s9Or.7xdGBFlqK"
-      ]
+      "description": "Ancient mechanisms activate around you. What opens when the correct sequence is entered?"
     },
     {
       "id": 8,
       "title": "Task Number: 8",
-      "description": "The maze's energy intensifies. What guides travelers through unknown paths?",
-      "correctAnswers": [
-        "$2b$10$/LqKsubq4iVKNnDTryM/4eIOvoK3L06KmVX6Ta0hu0TboaRznHD6u",
-        "$2b$10$ifcnJi8FKS2lCBZIw1r/qOZdtM4Iap7zOXtcfoaCF3odY26EPkyJC",
-        "$2b$10$k1gish93Zjj3JWjeCgouLuVifAzRpdhwPsZCIfl0v0zoWlNMibnKS",
-        "$2b$10$qmgdF.BDbjt6eEXR7Je8NuDE2pulfLXEXjo8jI3gZvSt1f3S0taGm"
-      ]
+      "description": "The maze's energy intensifies. What guides travelers through unknown paths?"
     },
     {
       "id": 9,
       "title": "Task Number: 9",
-      "description": "Almost there! The final chambers await. What marks the conclusion of a great journey?",
-      "correctAnswers": [
-        "$2b$10$F9WcE8DNPMpJ.A3gEL.s4eyaroD2KAzwHx0OxQl.fEx2oPD.BNIHq",
-        "$2b$10$3gylrLiAMDkZgWdZW.ME4.pVJirl/1owbqsoeH/Sjk/RV5i1tLHb2",
-        "$2b$10$kc97r1gONejwKhT30MTeZuYOAss0Drp5HgCx2GHHC.3QpzsYheMIG",
-        "$2b$10$qXJTOqkY1rRW6nLoMos3CeLxTVOM0.7d8I.LvQGzz/B5s21a9lgti"
-      ]
+      "description": "Almost there! The final chambers await. What marks the conclusion of a great journey?"
     },
     {
       "id": 10,
       "title": "Task Number: 10",
-      "description": "The last challenge approaches. What do victorious heroes claim at journey's end?",
-      "correctAnswers": [
-        "$2b$10$sEeep/r4whMw4ECuyqXLW.9Ig09.tgwzC4hBkMbJzesfNlgl..Wuy",
-        "$2b$10$N4ILqmBljMP6uePknS4ZH.frpCqPjfuhlnPqZrsXRqj0x/qIj5gEy",
-        "$2b$10$vTUMXEUWUjdJlX4PI0ncYeOaCrCEIf7vLTcdaW04ivdyiQl1K/ch.",
-        "$2b$10$faal0bPGsFH3GjlTxwMWSOW97FjQoIZSNVx.tFrqO.9EcDkZnXbsC"
-      ]
+      "description": "The last challenge approaches. What do victorious heroes claim at journey's end?"
     },
     {
       "id": 11,
       "title": "Task Number: 11",
-      "description": "The final step! The maze's heart pulses with ancient power. What word completes all journeys?",
-      "correctAnswers": [
-        "$2b$10$qGaZiF8PkkjII2Nxs9meiemUC0US9buXWdsrbqi9y5Ud4CsfHLmwm",
-        "$2b$10$omUWZwhQYp9SJ8CsdC/rN.7XQcyUwB98N/871fzd5yUZS2ZL4LRBO",
-        "$2b$10$uUfWDDI/Y1BpfBQeQoUqIe1cbim2yRK5mvkglqtsP8.b3zPZC4fBq",
-        "$2b$10$6OppBRjk2QWUbOr.Q1nflOifnlkWZPcpHzzlV6h.TSWAJfuNbGAJy"
-      ]
+      "description": "The final step! The maze's heart pulses with ancient power. What word completes all journeys?"
     }
   ]
 }

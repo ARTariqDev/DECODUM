@@ -200,6 +200,15 @@ const Tasks = () => {
         
         {/* Mobile Layout */}
         <div className="lg:hidden flex flex-col h-full">
+          {/* Mini progress indicator for mobile */}
+          <div className="flex justify-center mb-2">
+            <div className="bg-[#111111] border border-[#e6d8a3] rounded-lg px-3 py-1">
+              <span className="text-xs font-medium text-[#e6d8a3]">
+                Question {mazeProgress}/11
+              </span>
+            </div>
+          </div>
+          
           <div className="h-[35vh] flex items-center justify-center mb-8">
             <div className="w-full max-w-[90vw] h-full flex items-center justify-center">
               <div style={{ transform: 'scale(0.55)' }}>
@@ -312,22 +321,6 @@ const Tasks = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* Progress Bar */}
-            <div className="bg-[#111111] border border-gray-600 rounded-lg p-2">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-gray-400">Progress</span>
-                <span className="text-xs font-medium text-[#e6d8a3]">
-                  {mazeProgress}/11
-                </span>
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-1.5">
-                <div 
-                  className="bg-gradient-to-r from-[#e6d8a3] to-[#fff8de] h-1.5 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${(mazeProgress / 11) * 100}%` }}
-                ></div>
               </div>
             </div>
           </div>
@@ -445,22 +438,6 @@ const Tasks = () => {
                       </div>
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="bg-[#111111] border border-gray-600 rounded-lg p-2">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-gray-400">Progress</span>
-                  <span className="text-xs font-medium text-[#e6d8a3]">
-                    {mazeProgress}/11
-                  </span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-1">
-                  <div 
-                    className="bg-gradient-to-r from-[#e6d8a3] to-[#fff8de] h-1 rounded-full transition-all duration-500 ease-out"
-                    style={{ width: `${(mazeProgress / 11) * 100}%` }}
-                  ></div>
                 </div>
               </div>
             </div>
