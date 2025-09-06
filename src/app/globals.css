@@ -59,7 +59,7 @@ body {
 
 .film-grain-wrapper {
   position: relative;
-  overflow-x: hidden; /*this was overflow: didden before so it wouldnt let user scroll*/
+  overflow-x: hidden; /*this was overflow: hidden before so it wouldnt let user scroll*/
   overflow-y: auto;    
 }
 
@@ -175,26 +175,26 @@ body {
 
 /* Log image styling */
 .log-image-container {
-  margin: 1rem auto; /* Center horizontally with auto margins */
+  margin: 1rem auto;
   text-align: center;
   border: 1px solid rgba(255, 248, 222, 0.3);
   border-radius: 8px;
   padding: 0.5rem;
   background: rgba(255, 248, 222, 0.05);
-  display: block; /* Changed from inline-block to block for proper centering */
-  width: fit-content; /* Fit container to content width */
-  max-width: 90%; /* Responsive max width */
+  display: block; 
+  width: fit-content;
+  max-width: 90%;
 }
 
 .log-image {
   max-width: 100%;
-  max-height: 300px; /* Limit image height */
+  max-height: 300px;
   height: auto;
   width: auto;
   border-radius: 4px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   transition: transform 0.3s ease;
-  object-fit: contain; /* Maintain aspect ratio */
+  object-fit: contain; 
 }
 
 .log-image:hover {
