@@ -78,7 +78,23 @@ const Tasks = () => {
 
   const currentTask = tasks[currentTaskIndex] || tasks[0];
 
+  // Calculate actual progress based on non-empty task answers
+  const calculateActualProgress = () => {
+    return Object.values(taskAnswers).filter(answer => answer && answer.trim() !== "").length;
+  };
+
+  const actualProgress = calculateActualProgress();
+
+  // Check if maze should be completed based on actual progress
+  useEffect(() => {
+    if (actualProgress >= 11) {
+      setMazeCompleted(true);
+    }
+  }, [actualProgress]);
+
   const handleMoveComplete = useCallback((step, isCompleted) => {
+    // This callback is no longer used since sprite moves based on task answers
+    // But keeping it for compatibility
     if (isCompleted && step === 11) {
       console.log("Maze completed!");
       setMazeCompleted(true);
@@ -204,7 +220,7 @@ const Tasks = () => {
           <div className="flex justify-center mb-2">
             <div className="bg-[#111111] border border-[#e6d8a3] rounded-lg px-3 py-1">
               <span className="text-xs font-medium text-[#e6d8a3]">
-                Question {mazeProgress}/11
+                Question {actualProgress}/11
               </span>
             </div>
           </div>
@@ -213,7 +229,7 @@ const Tasks = () => {
             <div className="w-full max-w-[90vw] h-full flex items-center justify-center">
               <div style={{ transform: 'scale(0.55)' }}>
                 <Maze 
-                  currentStep={mazeProgress} 
+                  currentStep={actualProgress} 
                   totalSteps={11} 
                   onMoveComplete={handleMoveComplete}
                 />
@@ -332,7 +348,7 @@ const Tasks = () => {
             <div className="flex justify-center items-center order-1 lg:order-1">
               <div className="w-full max-w-[450px]">
                 <Maze 
-                  currentStep={mazeProgress} 
+                  currentStep={actualProgress} 
                   totalSteps={11} 
                   onMoveComplete={handleMoveComplete}
                 />

@@ -15,7 +15,8 @@ const LogCard = ({ title, date, desc, onView }) => {
     if (!text) return '';
     
     let processedText = text.replace(/\[HIDDEN\].*?\[\/HIDDEN\]/g, '') //hides text
-                          .replace(/\[SCRAMBLE\](.*?)\[\/SCRAMBLE\]/g, (match, content) => jumbleText(content)); //scrambles text
+                          .replace(/\[SCRAMBLE\](.*?)\[\/SCRAMBLE\]/g, (match, content) => jumbleText(content)) //scrambles text
+                          .replace(/\[IMAGE\s+SRC=\{.*?\}\]\[\/IMAGE\]/g, ''); //remove images from preview
     
     if (showBlurred) {
       // For titles, wrap blurred content in span

@@ -173,6 +173,35 @@ body {
   user-select: text;
 }
 
+/* Log image styling */
+.log-image-container {
+  margin: 1rem auto; /* Center horizontally with auto margins */
+  text-align: center;
+  border: 1px solid rgba(255, 248, 222, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem;
+  background: rgba(255, 248, 222, 0.05);
+  display: block; /* Changed from inline-block to block for proper centering */
+  width: fit-content; /* Fit container to content width */
+  max-width: 90%; /* Responsive max width */
+}
+
+.log-image {
+  max-width: 100%;
+  max-height: 300px; /* Limit image height */
+  height: auto;
+  width: auto;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+  object-fit: contain; /* Maintain aspect ratio */
+}
+
+.log-image:hover {
+  transform: scale(1.05);
+  cursor: zoom-in;
+}
+
 html, body, button, a, input, textarea {
   cursor: url('/cursor.svg') 10 10, auto !important;
 }

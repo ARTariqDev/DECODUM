@@ -132,6 +132,16 @@ const Maze = ({ onMoveComplete, currentStep = 0, totalSteps = 11 }) => {
     totalStepsRef.current = totalSteps;
   }, [onMoveComplete, totalSteps]);
 
+  // Add effect to handle currentStep changes
+  useEffect(() => {
+    if (game && game.scene.keys.MazeScene) {
+      const scene = game.scene.keys.MazeScene;
+      if (scene.updatePlayerPosition) {
+        scene.updatePlayerPosition(currentStep);
+      }
+    }
+  }, [currentStep, game]);
+
   const handleMoveComplete = useCallback((step, isCompleted) => {
     if (onMoveCompleteRef.current) {
       onMoveCompleteRef.current(step, isCompleted);
@@ -187,19 +197,25 @@ const Maze = ({ onMoveComplete, currentStep = 0, totalSteps = 11 }) => {
           this.createPlayerSprite();
 
           if (path.length > 0) {
+            // Calculate initial position based on currentStep prop
+            const initialStep = Math.min(currentStep, path.length - 1);
+            const currentPosition = path[initialStep];
+            
+            this.step = initialStep;
             this.player = this.add.sprite(
-              path[0].x * tileSize + tileSize / 2,
-              path[0].y * tileSize + tileSize / 2,
+              currentPosition.x * tileSize + tileSize / 2,
+              currentPosition.y * tileSize + tileSize / 2,
               "player"
             );
             this.player.setScale(0.8);
 
             const glowCircle = this.add.circle(
-              path[0].x * tileSize + tileSize / 2,
-              path[0].y * tileSize + tileSize / 2,
+              currentPosition.x * tileSize + tileSize / 2,
+              currentPosition.y * tileSize + tileSize / 2,
               14, 0xe6d8a3
             );
             glowCircle.setAlpha(0.3);
+            this.playerGlow = glowCircle;
             this.playerGlow = glowCircle;
             
             this.tweens.add({
@@ -282,31 +298,8 @@ const Maze = ({ onMoveComplete, currentStep = 0, totalSteps = 11 }) => {
         }
 
         movePlayer() {
-          if (this.isMoving || this.step >= path.length - 1 || path.length === 0) return;
-
-          if (this.taskMessage) {
-            this.taskMessage.destroy();
-            this.taskMessage = null;
-          }
-
-          this.isMoving = true;
-          this.clickCount++;
-          
-          const totalSteps = path.length - 1;
-          const remainingSteps = totalSteps - this.step;
-          const remainingClicks = 11 - this.clickCount;
-          
-          let stepsToMove;
-          if (this.clickCount === 11 || remainingClicks === 0) {
-            stepsToMove = remainingSteps;
-          } else {
-            stepsToMove = Math.floor(remainingSteps / (remainingClicks + 1));
-            if (stepsToMove === 0 && remainingSteps > 0) {
-              stepsToMove = 1;
-            }
-          }
-
-          this.animateMovement(Math.min(stepsToMove, remainingSteps));
+          // Disabled - sprite now moves based on task answers, not clicks
+          return;
         }
 
         animateMovement(stepsToMove) {
@@ -404,19 +397,29 @@ const Maze = ({ onMoveComplete, currentStep = 0, totalSteps = 11 }) => {
         }
 
         updateProgress() {
+          // Clear any existing completion text and effects
+          if (this.completionText) {
+            this.completionText.destroy();
+            this.completionText = null;
+          }
+          if (this.completionGlow) {
+            this.completionGlow.destroy();
+            this.completionGlow = null;
+          }
+          
           if (this.step >= path.length - 1) {
-            this.add.text(this.player.x, this.player.y - 30, "Maze Completed!", {
+            this.completionText = this.add.text(this.player.x, this.player.y - 30, "Maze Completed!", {
               fontSize: "12px",
               color: "#00ff99",
               fontWeight: "bold",
               fontFamily: "monospace"
             }).setOrigin(0.5);
             
-            const completionGlow = this.add.circle(this.player.x, this.player.y, 25, 0x00ff99);
-            completionGlow.setAlpha(0.3);
+            this.completionGlow = this.add.circle(this.player.x, this.player.y, 25, 0x00ff99);
+            this.completionGlow.setAlpha(0.3);
             
             this.tweens.add({
-              targets: completionGlow,
+              targets: this.completionGlow,
               scaleX: 2,
               scaleY: 2,
               alpha: 0,
@@ -424,6 +427,43 @@ const Maze = ({ onMoveComplete, currentStep = 0, totalSteps = 11 }) => {
               ease: 'Power2'
             });
           }
+        }
+
+        updatePlayerPosition(newStep) {
+          if (!path.length || !this.player) return;
+          
+          const targetStep = Math.min(Math.max(0, newStep), path.length - 1);
+          if (targetStep === this.step) return; // No change needed
+          
+          const tileSize = 25;
+          const targetPosition = path[targetStep];
+          const targetX = targetPosition.x * tileSize + tileSize / 2;
+          const targetY = targetPosition.y * tileSize + tileSize / 2;
+          
+          // Animate to new position
+          this.tweens.add({
+            targets: this.player,
+            x: targetX,
+            y: targetY,
+            duration: 300,
+            ease: 'Power2'
+          });
+          
+          // Update glow circle position if it exists
+          if (this.playerGlow) {
+            this.tweens.add({
+              targets: this.playerGlow,
+              x: targetX,
+              y: targetY,
+              duration: 300,
+              ease: 'Power2'
+            });
+          }
+          
+          this.step = targetStep;
+          
+          // Update progress state (completion text/effects)
+          this.updateProgress();
         }
       }
 

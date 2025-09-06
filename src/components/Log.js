@@ -16,7 +16,8 @@ const Log = ({ title, date, desc }) => {
 
     return text.replace(/\[HIDDEN\](.*?)\[\/HIDDEN\]/g, '<span class="hidden-content">$1</span>')
                .replace(/\[SCRAMBLE\](.*?)\[\/SCRAMBLE\]/g, (match, content) => `<span class="scrambled-content">${jumbleText(content)}</span>`)
-               .replace(/\[BLUR\](.*?)\[\/BLUR\]/g, '<span class="blurred-content">$1</span>');
+               .replace(/\[BLUR\](.*?)\[\/BLUR\]/g, '<span class="blurred-content">$1</span>')
+               .replace(/\[IMAGE\s+SRC=\{(.*?)\}\]\[\/IMAGE\]/g, '<div class="log-image-container"><img src="$1" alt="Log Image" class="log-image" /></div>');
   };
 
   const parseTitle = (text) => {
