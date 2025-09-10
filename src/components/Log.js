@@ -59,7 +59,11 @@ const Log = ({ title, date, desc }) => {
       </p>
 
       <div 
-        className="prose prose-invert max-w-none text-justify text-base md:text-lg leading-relaxed"
+        className="prose prose-invert max-w-none text-justify text-base md:text-lg leading-relaxed break-words"
+        style={{
+          wordBreak: "break-word",
+          overflowWrap: "break-word",
+        }}
         dangerouslySetInnerHTML={{ __html: parseDescription(desc) }}
       />
     </article>
