@@ -54,11 +54,13 @@ const LogCard = ({ title, date, desc, onView }) => {
 
       <div>
         <h2
-          className="text-xl font-bold tracking-wide text-center md:text-left"
+          className="text-xl font-bold tracking-wide text-center md:text-left break-words"
           style={{
             WebkitTextStroke: "1px #fff8de",
             WebkitTextFillColor: "transparent",
             textShadow: "0 0 6px #fff8de",
+            wordBreak: "break-word",
+            overflowWrap: "break-word",
           }}
           dangerouslySetInnerHTML={{ __html: getTitleText(title) }}
         />

@@ -43,11 +43,13 @@ const Log = ({ title, date, desc }) => {
     > 
 
       <h1
-        className="text-3xl md:text-5xl font-bold mb-2 text-center md:text-left"
+        className="text-3xl md:text-5xl font-bold mb-2 text-center md:text-left break-words"
         style={{
           WebkitTextStroke: "1.5px #fff8de",
           WebkitTextFillColor: "transparent",
           textShadow: "0 0 8px #fff8de",
+          wordBreak: "break-word",
+          overflowWrap: "break-word",
         }}
         dangerouslySetInnerHTML={{ __html: parseTitle(title) }}
       />
