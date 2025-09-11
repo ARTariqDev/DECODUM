@@ -16,16 +16,24 @@ function LoginPage() {
     e.preventDefault();
     setIsLoading(false);
     const formData = new FormData(e.target);
-    const hasTeamID = formData.get("teamID");
-    const hasPassword = formData.get("password");
+    let teamID = formData.get("teamID");
+    let password = formData.get("password");
+    // Trim whitespace
+    teamID = teamID ? teamID.trim() : "";
+    password = password ? password.trim() : "";
 
-    if (hasTeamID && hasPassword) {
+    if (teamID && password) {
       setIsLoading(true);
       setError({});
 
+      // Create new FormData to ensure trimmed values are sent
+      const cleanFormData = new FormData();
+      cleanFormData.set("teamID", teamID);
+      cleanFormData.set("password", password);
+
       const res = await fetch("/api/auth", {
         method: "POST",
-        body: formData,
+        body: cleanFormData,
       });
       setIsLoading(false);
 
@@ -38,8 +46,8 @@ function LoginPage() {
       }
     } else {
       setError({
-        teamID: !hasTeamID && "TeamID is required!",
-        password: !hasPassword && "Password is required!",
+        teamID: !teamID && "TeamID is required!",
+        password: !password && "Password is required!",
       });
     }
   };

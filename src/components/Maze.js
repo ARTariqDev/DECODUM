@@ -197,70 +197,81 @@ const Maze = ({ onMoveComplete, currentStep = 0, totalSteps = 11 }) => {
           this.createPlayerSprite();
 
           if (path.length > 0) {
-            // Calculate initial position based on currentStep prop
-            const initialStep = Math.min(currentStep, path.length - 1);
-            const currentPosition = path[initialStep];
-            
-            this.step = initialStep;
-            this.player = this.add.sprite(
-              currentPosition.x * tileSize + tileSize / 2,
-              currentPosition.y * tileSize + tileSize / 2,
-              "player"
-            );
-            this.player.setScale(0.8);
+              // Proportionally map progress so sprite reaches end at exactly totalSteps (e.g., 11), move at least 1 and at most 4 steps per answer, always reach end at 11
+              let mappedStep = Math.round((currentStep / totalSteps) * (path.length - 1));
+              if (currentStep > 0 && mappedStep < currentStep) {
+                mappedStep = Math.min(currentStep, path.length - 1);
+              }
+              // Clamp to max 4 steps per answer, except for the last answer
+              if (currentStep > 0 && currentStep < totalSteps && mappedStep > currentStep * 4) {
+                mappedStep = currentStep * 4;
+              }
+              // Always force last answer to end
+              if (currentStep === totalSteps) {
+                mappedStep = path.length - 1;
+              }
+              const clampedStep = Math.max(0, Math.min(mappedStep, path.length - 1));
+              const currentPosition = path[clampedStep];
 
-            const glowCircle = this.add.circle(
-              currentPosition.x * tileSize + tileSize / 2,
-              currentPosition.y * tileSize + tileSize / 2,
-              14, 0xe6d8a3
-            );
-            glowCircle.setAlpha(0.3);
-            this.playerGlow = glowCircle;
-            this.playerGlow = glowCircle;
-            
-            this.tweens.add({
-              targets: glowCircle,
-              scaleX: 1.2,
-              scaleY: 1.2,
-              alpha: 0.1,
-              duration: 1500,
-              yoyo: true,
-              repeat: -1,
-              ease: 'Sine.easeInOut'
-            });
+              this.step = clampedStep;
+              this.player = this.add.sprite(
+                currentPosition.x * tileSize + tileSize / 2,
+                currentPosition.y * tileSize + tileSize / 2,
+                "player"
+              );
+              this.player.setScale(0.8);
 
-            this.add.text(path[0].x * tileSize + 2, path[0].y * tileSize + 2, "START", {
-              fontSize: "8px",
-              color: "#00ff88",
-              fontWeight: "bold",
-              fontFamily: "monospace"
-            });
+              const glowCircle = this.add.circle(
+                currentPosition.x * tileSize + tileSize / 2,
+                currentPosition.y * tileSize + tileSize / 2,
+                14, 0xe6d8a3
+              );
+              glowCircle.setAlpha(0.3);
+              this.playerGlow = glowCircle;
 
-            const endPos = path[path.length - 1];
-            this.add.text(endPos.x * tileSize + 2, endPos.y * tileSize + 2, "END", {
-              fontSize: "8px",
-              color: "#ff4444",
-              fontWeight: "bold",
-              fontFamily: "monospace"
-            });
+              this.tweens.add({
+                targets: glowCircle,
+                scaleX: 1.2,
+                scaleY: 1.2,
+                alpha: 0.1,
+                duration: 1500,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+              });
 
-            const portal = this.add.circle(
-              endPos.x * tileSize + tileSize / 2,
-              endPos.y * tileSize + tileSize / 2,
-              10, 0xe6d8a3
-            );
-            portal.setAlpha(0.6);
-            this.tweens.add({
-              targets: portal,
-              scaleX: 1.3,
-              scaleY: 1.3,
-              alpha: 0.3,
-              duration: 2000,
-              yoyo: true,
-              repeat: -1,
-              ease: 'Sine.easeInOut'
-            });
-          }
+              this.add.text(path[0].x * tileSize + 2, path[0].y * tileSize + 2, "START", {
+                fontSize: "8px",
+                color: "#00ff88",
+                fontWeight: "bold",
+                fontFamily: "monospace"
+              });
+
+              const endPos = path[path.length - 1];
+              this.add.text(endPos.x * tileSize + 2, endPos.y * tileSize + 2, "END", {
+                fontSize: "8px",
+                color: "#ff4444",
+                fontWeight: "bold",
+                fontFamily: "monospace"
+              });
+
+              const portal = this.add.circle(
+                endPos.x * tileSize + tileSize / 2,
+                endPos.y * tileSize + tileSize / 2,
+                10, 0xe6d8a3
+              );
+              portal.setAlpha(0.6);
+              this.tweens.add({
+                targets: portal,
+                scaleX: 1.3,
+                scaleY: 1.3,
+                alpha: 0.3,
+                duration: 2000,
+                yoyo: true,
+                repeat: -1,
+                ease: 'Sine.easeInOut'
+              });
+            }
 
           this.clickCount = 0;
         }
@@ -431,16 +442,26 @@ const Maze = ({ onMoveComplete, currentStep = 0, totalSteps = 11 }) => {
 
         updatePlayerPosition(newStep) {
           if (!path.length || !this.player) return;
-          
-          const targetStep = Math.min(Math.max(0, newStep), path.length - 1);
-          if (targetStep === this.step) return; // No change needed
-          
+          // Use the same mapping logic as in create()
+          // Proportionally map progress so sprite reaches end at exactly totalSteps (e.g., 11), move at least 1 and at most 4 steps per answer, always reach end at 11
+          let mappedStep = Math.round((newStep / totalStepsRef.current) * (path.length - 1));
+          if (newStep > 0 && mappedStep < newStep) {
+            mappedStep = Math.min(newStep, path.length - 1);
+          }
+          // Clamp to max 4 steps per answer, except for the last answer
+          if (newStep > 0 && newStep < totalStepsRef.current && mappedStep > newStep * 4) {
+            mappedStep = newStep * 4;
+          }
+          // Always force last answer to end
+          if (newStep === totalStepsRef.current) {
+            mappedStep = path.length - 1;
+          }
+          const clampedStep = Math.max(0, Math.min(mappedStep, path.length - 1));
           const tileSize = 25;
-          const targetPosition = path[targetStep];
+          const targetPosition = path[clampedStep];
           const targetX = targetPosition.x * tileSize + tileSize / 2;
           const targetY = targetPosition.y * tileSize + tileSize / 2;
-          
-          // Animate to new position
+          // Animate to new position (forward or backward)
           this.tweens.add({
             targets: this.player,
             x: targetX,
@@ -448,7 +469,6 @@ const Maze = ({ onMoveComplete, currentStep = 0, totalSteps = 11 }) => {
             duration: 300,
             ease: 'Power2'
           });
-          
           // Update glow circle position if it exists
           if (this.playerGlow) {
             this.tweens.add({
@@ -459,9 +479,7 @@ const Maze = ({ onMoveComplete, currentStep = 0, totalSteps = 11 }) => {
               ease: 'Power2'
             });
           }
-          
-          this.step = targetStep;
-          
+          this.step = clampedStep;
           // Update progress state (completion text/effects)
           this.updateProgress();
         }

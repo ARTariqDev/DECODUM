@@ -1,6 +1,8 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import RulesModal from "@/components/RulesModal";
+import Timer from "@/components/Timer";
 import Navbar from "@/components/Navbar";
 import Maze from "@/components/Maze";
 import TaskDescription from "@/components/TaskDescription";
@@ -9,6 +11,80 @@ import Footer from "@/components/Footer";
 
 const Tasks = () => {
   const [showDescription, setShowDescription] = useState(true);
+  const [showRulesModal, setShowRulesModal] = useState(true);
+  const [timerStarted, setTimerStarted] = useState(false);
+  const [timerSeconds, setTimerSeconds] = useState(7200);
+  const TIMER_KEY = "decodum_timer_start";
+  const timerExpiredRef = useRef(false);
+  const loggedOutRef = useRef(false);
+  // Show modal only on first login (sessionStorage flag)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const seenRules = sessionStorage.getItem('seenRulesModal');
+      const timerStart = localStorage.getItem(TIMER_KEY);
+      if (!seenRules) {
+        setShowRulesModal(true);
+      } else {
+        setShowRulesModal(false);
+        // If timerStart is missing, set it now (first time after login/reload)
+        let start = timerStart ? parseInt(timerStart, 10) : null;
+        if (!start || isNaN(start)) {
+          start = Math.floor(Date.now() / 1000);
+          localStorage.setItem(TIMER_KEY, start.toString());
+        }
+        const now = Math.floor(Date.now() / 1000);
+        const elapsed = now - start;
+        const left = Math.max(7200 - elapsed, 0);
+        setTimerSeconds(left);
+        setTimerStarted(true);
+      }
+    }
+  }, []);
+
+  // Start timer when modal is closed
+  const handleCloseRulesModal = () => {
+    setShowRulesModal(false);
+    setTimerStarted(true);
+    sessionStorage.setItem('seenRulesModal', '1');
+    // Always set timer start in localStorage when timer starts
+    localStorage.setItem(TIMER_KEY, Math.floor(Date.now() / 1000).toString());
+  };
+
+
+  useEffect(() => {
+    if (!timerStarted || timerExpiredRef.current || loggedOutRef.current) return;
+    if (timerSeconds <= 0) {
+      timerExpiredRef.current = true;
+      handleTimerExpire();
+      return;
+    }
+    const interval = setInterval(() => {
+      if (!loggedOutRef.current) {
+        setTimerSeconds((s) => {
+          if (s <= 1) {
+            // Timer expired, clear from localStorage
+            localStorage.removeItem(TIMER_KEY);
+            return 0;
+          }
+          return s - 1;
+        });
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line
+  }, [timerStarted, timerSeconds]);
+
+  const handleTimerExpire = async () => {
+    if (loggedOutRef.current) return;
+    loggedOutRef.current = true;
+    // Clear timer from localStorage
+    localStorage.removeItem(TIMER_KEY);
+    // Save all answers (simulate by calling saveAnswer for current task)
+    await saveAnswer();
+    // Log out user (clear session and redirect)
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/?logout=1'; // using query param here cause redirecting to '/' alone would not show the modal
+  };
   const [mazeProgress, setMazeProgress] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState("");
   const [mazeCompleted, setMazeCompleted] = useState(false);
@@ -78,12 +154,15 @@ const Tasks = () => {
 
   const currentTask = tasks[currentTaskIndex] || tasks[0];
 
-  // Calculate actual progress based on non-empty task answers
+
+  // Dummy state to force Maze re-render after save/clear
+  const [actualProgressTrigger, setActualProgressTrigger] = useState(0);
   const calculateActualProgress = () => {
     return Object.values(taskAnswers).filter(answer => answer && answer.trim() !== "").length;
   };
-
-  const actualProgress = calculateActualProgress();
+  // Sprite progress: number of non-empty answers (0-11)
+  // Use mazeProgress (from backend) to control sprite movement
+  const actualProgress = calculateActualProgress() + actualProgressTrigger * 0;
 
   // Check if maze should be completed based on actual progress
   useEffect(() => {
@@ -102,10 +181,10 @@ const Tasks = () => {
   }, []);
 
   const saveAnswer = async () => {
+    if (loggedOutRef.current) return;
     if (!currentTask || !isAuthenticated) return;
 
     setIsSaving(true);
-    
     try {
       const response = await fetch('/api/task-answers', {
         method: 'POST',
@@ -121,12 +200,11 @@ const Tasks = () => {
       if (response.ok) {
         setTaskAnswers(result.taskAnswers);
         setMazeProgress(result.mazeProgress);
-        
+        setActualProgressTrigger(v => v + 1); // force Maze update
         // Check if maze is completed
         if (result.mazeProgress >= 11) {
           setMazeCompleted(true);
         }
-        
         setIsEditing(false);
       } else {
         console.error('Error saving answer:', result.error);
@@ -142,7 +220,6 @@ const Tasks = () => {
     if (!currentTask || !isAuthenticated) return;
 
     setIsSaving(true);
-    
     try {
       const response = await fetch('/api/task-answers', {
         method: 'POST',
@@ -159,10 +236,9 @@ const Tasks = () => {
         setTaskAnswers(result.taskAnswers);
         setMazeProgress(result.mazeProgress);
         setCurrentAnswer("");
-        
+        setActualProgressTrigger(v => v + 1); // force Maze update
         // Update maze completed status
         setMazeCompleted(result.mazeProgress >= 11);
-        
         setIsEditing(false);
       } else {
         console.error('Error clearing answer:', result.error);
@@ -188,32 +264,52 @@ const Tasks = () => {
     <div className="flex flex-col h-screen overflow-hidden">
       <Navbar />
 
+      {/* Rules Modal */}
+      <RulesModal isOpen={showRulesModal} onClose={handleCloseRulesModal} />
+
+      {/* Timer */}
+      {timerStarted && !showRulesModal && (
+        <Timer secondsLeft={timerSeconds} onExpire={handleTimerExpire} />
+      )}
+
       {mazeCompleted && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
           <div className="bg-gray-900 border border-green-500 rounded-lg p-8 max-w-md mx-4 text-center">
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-3xl font-bold text-green-400 mb-4">Congratulations!</h2>
             <p className="text-gray-300 mb-6">
-              You have successfully completed the maze challenge!
+              You have successfully completed all tasks! You can now review your answers or save and logout.
             </p>
             <p className="text-yellow-400 mb-6">
               Team: {teamName}
             </p>
-            <Button
-              text="Return to Start"
-              glowColor="#00ff88"
-              className="w-full"
-              onClick={() => {
-                setMazeCompleted(false);
-                setCurrentTaskIndex(0);
-              }}
-            />
+            <div className="flex flex-col gap-3">
+              <Button
+                text="Save & Logout"
+                glowColor="#00ff88"
+                className="w-full"
+                onClick={async () => {
+                  // Clear timer from localStorage
+                  localStorage.removeItem(TIMER_KEY);
+                  await saveAnswer();
+                  await fetch('/api/auth/logout', { method: 'POST' });
+                  window.location.href = '/';
+                }}
+              />
+              <Button
+                text="Review Answers"
+                glowColor="#fff8de"
+                className="w-full"
+                onClick={() => setMazeCompleted(false)}
+              />
+            </div>
           </div>
         </div>
       )}
+  {/* Show a logout button under the answer section if all tasks are complete and user is reviewing answers */}
 
       <main className="flex-1 flex flex-col lg:block px-2 lg:px-4 pt-2 lg:pt-4 pb-2 lg:pb-4 overflow-hidden mt-[4rem]">
-        
+
         {/* Mobile Layout */}
         <div className="lg:hidden flex flex-col h-full">
           {/* Mini progress indicator for mobile */}
@@ -229,7 +325,7 @@ const Tasks = () => {
             <div className="w-full max-w-[90vw] h-full flex items-center justify-center">
               <div style={{ transform: 'scale(0.55)' }}>
                 <Maze 
-                  currentStep={actualProgress} 
+                  currentStep={mazeProgress} 
                   totalSteps={11} 
                   onMoveComplete={handleMoveComplete}
                 />
@@ -305,6 +401,19 @@ const Tasks = () => {
                         {isSaving ? 'Clearing...' : 'Clear'}
                       </button>
                     </div>
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        text="Logout"
+                        glowColor="#ff4d4d"
+                        className="flex-1 py-2"
+                        textSize="text-xs"
+                        onClick={async () => {
+                          await saveAnswer();
+                          await fetch('/api/auth/logout', { method: 'POST' });
+                          window.location.href = '/';
+                        }}
+                      />
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -348,7 +457,7 @@ const Tasks = () => {
             <div className="flex justify-center items-center order-1 lg:order-1">
               <div className="w-full max-w-[450px]">
                 <Maze 
-                  currentStep={actualProgress} 
+                  currentStep={mazeProgress} 
                   totalSteps={11} 
                   onMoveComplete={handleMoveComplete}
                 />
@@ -421,6 +530,19 @@ const Tasks = () => {
                         >
                           {isSaving ? 'Clearing...' : 'Clear'}
                         </button>
+                      </div>
+                      <div className="flex gap-1 mt-2">
+                        <Button
+                          text="Logout"
+                          glowColor="#ff4d4d"
+                          className="flex-1 py-1"
+                          textSize="text-xs"
+                          onClick={async () => {
+                            await saveAnswer();
+                            await fetch('/api/auth/logout', { method: 'POST' });
+                            window.location.href = '/';
+                          }}
+                        />
                       </div>
                     </div>
                   ) : (

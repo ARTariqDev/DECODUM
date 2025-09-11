@@ -82,7 +82,17 @@ export async function POST(request) {
     }
 
     const teamID = payload.TeamId;
-    const { taskId, answer } = await request.json();
+    let taskId, answer;
+    try {
+      const body = await request.json();
+      taskId = body.taskId;
+      answer = body.answer;
+    } catch (e) {
+      return NextResponse.json(
+        { error: 'Invalid or empty JSON body' },
+        { status: 400 }
+      );
+    }
 
     if (taskId === undefined || taskId === null) {
       return NextResponse.json(
