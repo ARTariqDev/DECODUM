@@ -28,9 +28,7 @@ function Footer() {
         <span className="relative z-10">Syed Farjad Abbas</span>
         <span className="absolute inset-0 bg-gradient-to-r from-[#fff8de]/0 via-[#fff8de]/10 to-[#fff8de]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></span>
       </Link>
-    </section>,
-    "⚬",
-    "Graphics By Abdul Basit",
+    </section>
   ];
 
   return (
