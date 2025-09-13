@@ -10,7 +10,6 @@ import Button from "@/components/Button";
 import Footer from "@/components/Footer";
 
 const Tasks = () => {
-  const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showDescription, setShowDescription] = useState(true);
   const [showRulesModal, setShowRulesModal] = useState(true);
   const [timerStarted, setTimerStarted] = useState(false);
@@ -20,6 +19,22 @@ const Tasks = () => {
   const loggedOutRef = useRef(false);
   // Show modal only on first login (sessionStorage flag)
   useEffect(() => {
+    //example of how the timer api work. the same thing works for time-ended
+    // async function fetchTimeStarted() {
+    //   const res = await fetch("/api/timer/time-started");
+    //   const { timeStarted } = await res.json();
+    //
+    //   // If timeStarted/timeEnded is null, the user is logging for the first time
+
+    //   if (!timeStarted) {
+    //     await fetch("/api/timer/time-started", {
+    //       method: "POST",
+    //       body: JSON.stringify({ newTime: Date.now() }),
+    //     });
+    //   }
+    // }
+    // fetchTimeStarted();
+
     if (typeof window !== "undefined") {
       const seenRules = sessionStorage.getItem("seenRulesModal");
       const timerStart = localStorage.getItem(TIMER_KEY);

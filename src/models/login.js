@@ -30,6 +30,14 @@ const loginSchema = new Schema({
     of: String,
     default: new Map(),
   },
+  timeStarted: {
+    type: Number,
+    default: null,
+  },
+  timeEnded: {
+    type: Number,
+    default: null,
+  },
 });
 
 export default mongoose.models.Login || mongoose.model("Login", loginSchema);

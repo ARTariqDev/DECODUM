@@ -1,9 +1,20 @@
+import bcrypt from "bcrypt";
 
-// Plain-text password comparison (not secure)
-export function hashPassword(plainPass) {
-  return plainPass;
+const saltRounds = 10;
+
+export async function hashPassword(plainPass) {
+  return bcrypt
+    .hash(plainPass, saltRounds)
+    .then((hash) => hash)
+    .catch((err) => console.error("error: ", err));
 }
 
-export async function checkPass(plainPass, storedPass) {
-  return plainPass === storedPass;
+export async function checkPass(plainPass, hash) {
+  try {
+    const result = await bcrypt.compare(plainPass, hash);
+    return result;
+  } catch (e) {
+    console.log("Error in comparing password");
+    console.error(err);
+  }
 }
