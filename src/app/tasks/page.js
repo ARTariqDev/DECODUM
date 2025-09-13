@@ -477,7 +477,6 @@ const Tasks = () => {
               style={{ maxHeight: "calc(100vh - 8rem)" }}
             >
               {/* Task Navigation */}
-              {/* Task Navigation */}
               <div className="bg-[#111111] border border-gray-600 rounded-lg p-2">
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="text-sm font-semibold text-[#e6d8a3]">

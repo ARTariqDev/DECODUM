@@ -15,7 +15,7 @@ const taskToLogTitles = {
   6: [],
   7: ["Grateful"],
   8: ["Bad People Everywhere", "Corrupt and Stupid", "I’m trying my best", "I don’t like", "Luigi"],
-  9: ["d077f244def8a70e5ea758bd8352fcd8"],
+  9: ["????"],
   10: ["Health is Wealth"],
 };
 
