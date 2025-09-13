@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import RulesModal from "@/components/RulesModal";
@@ -10,6 +10,7 @@ import Button from "@/components/Button";
 import Footer from "@/components/Footer";
 
 const Tasks = () => {
+  const [hasSubmitted, setHasSubmitted] = useState(false);
   const [showDescription, setShowDescription] = useState(true);
   const [showRulesModal, setShowRulesModal] = useState(true);
   const [timerStarted, setTimerStarted] = useState(false);
@@ -19,8 +20,8 @@ const Tasks = () => {
   const loggedOutRef = useRef(false);
   // Show modal only on first login (sessionStorage flag)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const seenRules = sessionStorage.getItem('seenRulesModal');
+    if (typeof window !== "undefined") {
+      const seenRules = sessionStorage.getItem("seenRulesModal");
       const timerStart = localStorage.getItem(TIMER_KEY);
       if (!seenRules) {
         setShowRulesModal(true);
@@ -45,14 +46,14 @@ const Tasks = () => {
   const handleCloseRulesModal = () => {
     setShowRulesModal(false);
     setTimerStarted(true);
-    sessionStorage.setItem('seenRulesModal', '1');
+    sessionStorage.setItem("seenRulesModal", "1");
     // Always set timer start in localStorage when timer starts
     localStorage.setItem(TIMER_KEY, Math.floor(Date.now() / 1000).toString());
   };
 
-
   useEffect(() => {
-    if (!timerStarted || timerExpiredRef.current || loggedOutRef.current) return;
+    if (!timerStarted || timerExpiredRef.current || loggedOutRef.current)
+      return;
     if (timerSeconds <= 0) {
       timerExpiredRef.current = true;
       handleTimerExpire();
@@ -82,8 +83,8 @@ const Tasks = () => {
     // Save all answers (simulate by calling saveAnswer for current task)
     await saveAnswer();
     // Log out user (clear session and redirect)
-    await fetch('/api/auth/logout', { method: 'POST' });
-    window.location.href = '/?logout=1'; // using query param here cause redirecting to '/' alone would not show the modal
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.href = "/?logout=1"; // using query param here cause redirecting to '/' alone would not show the modal
   };
   const [mazeProgress, setMazeProgress] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState("");
@@ -99,25 +100,27 @@ const Tasks = () => {
   useEffect(() => {
     const loadTasks = async () => {
       try {
-        const response = await fetch('/api/tasks');
+        const response = await fetch("/api/tasks");
         const data = await response.json();
         setTasks(data.tasks);
       } catch (error) {
-        console.error('Error loading tasks:', error);
+        console.error("Error loading tasks:", error);
         // Fallback task if JSON loading fails
-        setTasks([{
-          id: 1,
-          title: "Default Task",
-          description: "Complete the maze challenge",
-          correctAnswers: ["start"]
-        }]);
+        setTasks([
+          {
+            id: 1,
+            title: "Default Task",
+            description: "Complete the maze challenge",
+            correctAnswers: ["start"],
+          },
+        ]);
       }
     };
 
     const checkAuth = async () => {
       try {
-        const response = await fetch('/api/auth', {
-          method: 'GET',
+        const response = await fetch("/api/auth", {
+          method: "GET",
         });
         if (response.ok) {
           const data = await response.json();
@@ -126,17 +129,17 @@ const Tasks = () => {
           setMazeProgress(data.mazeProgress || 0);
           setCurrentTaskIndex(data.currentTaskIndex || 0);
           setTaskAnswers(data.taskAnswers || {});
-          
+
           // Set maze completed if progress is 11
           if (data.mazeProgress >= 11) {
             setMazeCompleted(true);
           }
         } else {
-          window.location.href = '/login';
+          window.location.href = "/login";
         }
       } catch (error) {
-        console.error('Error checking authentication:', error);
-        window.location.href = '/login';
+        console.error("Error checking authentication:", error);
+        window.location.href = "/login";
       }
     };
 
@@ -154,11 +157,12 @@ const Tasks = () => {
 
   const currentTask = tasks[currentTaskIndex] || tasks[0];
 
-
   // Dummy state to force Maze re-render after save/clear
   const [actualProgressTrigger, setActualProgressTrigger] = useState(0);
   const calculateActualProgress = () => {
-    return Object.values(taskAnswers).filter(answer => answer && answer.trim() !== "").length;
+    return Object.values(taskAnswers).filter(
+      (answer) => answer && answer.trim() !== ""
+    ).length;
   };
   // Sprite progress: number of non-empty answers (0-11)
   // Use mazeProgress (from backend) to control sprite movement
@@ -186,13 +190,13 @@ const Tasks = () => {
 
     setIsSaving(true);
     try {
-      const response = await fetch('/api/task-answers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          taskId: currentTask.id, 
-          answer: currentAnswer
-        })
+      const response = await fetch("/api/task-answers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskId: currentTask.id,
+          answer: currentAnswer,
+        }),
       });
 
       const result = await response.json();
@@ -200,17 +204,17 @@ const Tasks = () => {
       if (response.ok) {
         setTaskAnswers(result.taskAnswers);
         setMazeProgress(result.mazeProgress);
-        setActualProgressTrigger(v => v + 1); // force Maze update
+        setActualProgressTrigger((v) => v + 1); // force Maze update
         // Check if maze is completed
         if (result.mazeProgress >= 11) {
           setMazeCompleted(true);
         }
         setIsEditing(false);
       } else {
-        console.error('Error saving answer:', result.error);
+        console.error("Error saving answer:", result.error);
       }
     } catch (error) {
-      console.error('Error saving answer:', error);
+      console.error("Error saving answer:", error);
     } finally {
       setIsSaving(false);
     }
@@ -221,13 +225,13 @@ const Tasks = () => {
 
     setIsSaving(true);
     try {
-      const response = await fetch('/api/task-answers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          taskId: currentTask.id, 
-          answer: ""
-        })
+      const response = await fetch("/api/task-answers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          taskId: currentTask.id,
+          answer: "",
+        }),
       });
 
       const result = await response.json();
@@ -236,24 +240,24 @@ const Tasks = () => {
         setTaskAnswers(result.taskAnswers);
         setMazeProgress(result.mazeProgress);
         setCurrentAnswer("");
-        setActualProgressTrigger(v => v + 1); // force Maze update
+        setActualProgressTrigger((v) => v + 1); // force Maze update
         // Update maze completed status
         setMazeCompleted(result.mazeProgress >= 11);
         setIsEditing(false);
       } else {
-        console.error('Error clearing answer:', result.error);
+        console.error("Error clearing answer:", result.error);
       }
     } catch (error) {
-      console.error('Error clearing answer:', error);
+      console.error("Error clearing answer:", error);
     } finally {
       setIsSaving(false);
     }
   };
 
   const navigateToTask = (direction) => {
-    if (direction === 'next' && currentTaskIndex < tasks.length - 1) {
+    if (direction === "next" && currentTaskIndex < tasks.length - 1) {
       setCurrentTaskIndex(currentTaskIndex + 1);
-    } else if (direction === 'prev' && currentTaskIndex > 0) {
+    } else if (direction === "prev" && currentTaskIndex > 0) {
       setCurrentTaskIndex(currentTaskIndex - 1);
     }
   };
@@ -276,13 +280,14 @@ const Tasks = () => {
         <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
           <div className="bg-gray-900 border border-green-500 rounded-lg p-8 max-w-md mx-4 text-center">
             <div className="text-6xl mb-4">🎉</div>
-            <h2 className="text-3xl font-bold text-green-400 mb-4">Congratulations!</h2>
+            <h2 className="text-3xl font-bold text-green-400 mb-4">
+              Congratulations!
+            </h2>
             <p className="text-gray-300 mb-6">
-              You have successfully completed all tasks! You can now review your answers or save and logout.
+              You have successfully completed all tasks! You can now review your
+              answers or save and logout.
             </p>
-            <p className="text-yellow-400 mb-6">
-              Team: {teamName}
-            </p>
+            <p className="text-yellow-400 mb-6">Team: {teamName}</p>
             <div className="flex flex-col gap-3">
               <Button
                 text="Save & Logout"
@@ -292,8 +297,8 @@ const Tasks = () => {
                   // Clear timer from localStorage
                   localStorage.removeItem(TIMER_KEY);
                   await saveAnswer();
-                  await fetch('/api/auth/logout', { method: 'POST' });
-                  window.location.href = '/';
+                  await fetch("/api/auth/logout", { method: "POST" });
+                  window.location.href = "/";
                 }}
               />
               <Button
@@ -306,10 +311,9 @@ const Tasks = () => {
           </div>
         </div>
       )}
-  {/* Show a logout button under the answer section if all tasks are complete and user is reviewing answers */}
+      {/* Show a logout button under the answer section if all tasks are complete and user is reviewing answers */}
 
       <main className="flex-1 flex flex-col lg:block px-2 lg:px-4 pt-2 lg:pt-4 pb-2 lg:pb-4 overflow-hidden mt-[4rem]">
-
         {/* Mobile Layout */}
         <div className="lg:hidden flex flex-col h-full">
           {/* Mini progress indicator for mobile */}
@@ -320,13 +324,13 @@ const Tasks = () => {
               </span>
             </div>
           </div>
-          
+
           <div className="h-[35vh] flex items-center justify-center mb-8">
             <div className="w-full max-w-[90vw] h-full flex items-center justify-center">
-              <div style={{ transform: 'scale(0.55)' }}>
-                <Maze 
-                  currentStep={mazeProgress} 
-                  totalSteps={11} 
+              <div style={{ transform: "scale(0.55)" }}>
+                <Maze
+                  currentStep={mazeProgress}
+                  totalSteps={11}
                   onMoveComplete={handleMoveComplete}
                 />
               </div>
@@ -339,22 +343,24 @@ const Tasks = () => {
             {/* Task Navigation */}
             <div className="bg-[#111111] border border-gray-600 rounded-lg p-3">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-semibold text-[#e6d8a3]">Task Navigation</h3>
+                <h3 className="text-sm font-semibold text-[#e6d8a3]">
+                  Task Navigation
+                </h3>
                 <span className="text-xs text-gray-400">
                   {currentTaskIndex + 1} of {tasks.length}
                 </span>
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => navigateToTask('prev')}
+                  onClick={() => navigateToTask("prev")}
                   disabled={currentTaskIndex === 0}
                   className="flex-1 px-3 py-2 rounded bg-gray-800 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700"
                 >
                   ← Previous
                 </button>
                 <button
-                  onClick={() => navigateToTask('next')}
-                  disabled={currentTaskIndex >= tasks.length - 1}
+                  onClick={() => navigateToTask("next")}
+                  disabled={currentTaskIndex >= tasks.length - 1 || !hasAnswer}
                   className="flex-1 px-3 py-2 rounded bg-gray-800 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700"
                 >
                   Next →
@@ -377,8 +383,10 @@ const Tasks = () => {
             {/* Answer Section */}
             <div className="bg-[#111111] border border-gray-600 rounded-lg p-3">
               <div className="text-center space-y-2">
-                <h3 className="text-sm font-semibold text-[#e6d8a3]">Your Answer</h3>
-                
+                <h3 className="text-sm font-semibold text-[#e6d8a3]">
+                  Your Answer
+                </h3>
+
                 {hasAnswer && !isEditing ? (
                   <div className="space-y-2">
                     <p className="text-xs text-gray-400">Current answer:</p>
@@ -398,7 +406,7 @@ const Tasks = () => {
                         disabled={isSaving}
                         className="flex-1 px-3 py-2 rounded bg-red-600 text-white text-xs hover:bg-red-700 disabled:opacity-50"
                       >
-                        {isSaving ? 'Clearing...' : 'Clear'}
+                        {isSaving ? "Clearing..." : "Clear"}
                       </button>
                     </div>
                     <div className="flex gap-2 mt-2">
@@ -409,8 +417,8 @@ const Tasks = () => {
                         textSize="text-xs"
                         onClick={async () => {
                           await saveAnswer();
-                          await fetch('/api/auth/logout', { method: 'POST' });
-                          window.location.href = '/';
+                          await fetch("/api/auth/logout", { method: "POST" });
+                          window.location.href = "/";
                         }}
                       />
                     </div>
@@ -425,7 +433,7 @@ const Tasks = () => {
                     />
                     <div className="flex gap-2">
                       <Button
-                        text={isSaving ? 'Saving...' : 'Save Answer'}
+                        text={isSaving ? "Saving..." : "Save Answer"}
                         glowColor="#fff8de"
                         className="flex-1 py-2"
                         textSize="text-xs"
@@ -456,35 +464,42 @@ const Tasks = () => {
           <div className="grid lg:grid-cols-2 gap-4 h-full">
             <div className="flex justify-center items-center order-1 lg:order-1">
               <div className="w-full max-w-[450px]">
-                <Maze 
-                  currentStep={mazeProgress} 
-                  totalSteps={11} 
+                <Maze
+                  currentStep={mazeProgress}
+                  totalSteps={11}
                   onMoveComplete={handleMoveComplete}
                 />
               </div>
             </div>
 
-            <div className="space-y-3 order-2 lg:order-2 overflow-y-auto pr-2 mt-8" style={{ maxHeight: 'calc(100vh - 8rem)' }}>
+            <div
+              className="space-y-3 order-2 lg:order-2 overflow-y-auto pr-2 mt-8"
+              style={{ maxHeight: "calc(100vh - 8rem)" }}
+            >
               {/* Task Navigation */}
               {/* Task Navigation */}
               <div className="bg-[#111111] border border-gray-600 rounded-lg p-2">
                 <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-sm font-semibold text-[#e6d8a3]">Task Navigation</h3>
+                  <h3 className="text-sm font-semibold text-[#e6d8a3]">
+                    Task Navigation
+                  </h3>
                   <span className="text-xs text-gray-400">
                     {currentTaskIndex + 1} of {tasks.length}
                   </span>
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => navigateToTask('prev')}
+                    onClick={() => navigateToTask("prev")}
                     disabled={currentTaskIndex === 0}
                     className="flex-1 px-2 py-1 rounded bg-gray-800 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700"
                   >
                     ← Previous
                   </button>
                   <button
-                    onClick={() => navigateToTask('next')}
-                    disabled={currentTaskIndex >= tasks.length - 1}
+                    onClick={() => navigateToTask("next")}
+                    disabled={
+                      currentTaskIndex >= tasks.length - 1 || !hasAnswer
+                    }
                     className="flex-1 px-2 py-1 rounded bg-gray-800 text-white text-xs disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700"
                   >
                     Next →
@@ -507,8 +522,10 @@ const Tasks = () => {
               {/* Answer Section */}
               <div className="bg-[#111111] border border-gray-600 rounded-lg p-2">
                 <div className="text-center space-y-2">
-                  <h3 className="text-sm font-semibold text-[#e6d8a3]">Your Answer</h3>
-                  
+                  <h3 className="text-sm font-semibold text-[#e6d8a3]">
+                    Your Answer
+                  </h3>
+
                   {hasAnswer && !isEditing ? (
                     <div className="space-y-2">
                       <p className="text-xs text-gray-400">Current answer:</p>
@@ -528,7 +545,7 @@ const Tasks = () => {
                           disabled={isSaving}
                           className="px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 text-xs"
                         >
-                          {isSaving ? 'Clearing...' : 'Clear'}
+                          {isSaving ? "Clearing..." : "Clear"}
                         </button>
                       </div>
                       <div className="flex gap-1 mt-2">
@@ -539,8 +556,8 @@ const Tasks = () => {
                           textSize="text-xs"
                           onClick={async () => {
                             await saveAnswer();
-                            await fetch('/api/auth/logout', { method: 'POST' });
-                            window.location.href = '/';
+                            await fetch("/api/auth/logout", { method: "POST" });
+                            window.location.href = "/";
                           }}
                         />
                       </div>
@@ -555,7 +572,7 @@ const Tasks = () => {
                       />
                       <div className="flex gap-1">
                         <Button
-                          text={isSaving ? 'Saving...' : 'Save'}
+                          text={isSaving ? "Saving..." : "Save"}
                           glowColor="#fff8de"
                           className="flex-1 py-1"
                           textSize="text-xs"
@@ -565,7 +582,9 @@ const Tasks = () => {
                         {hasAnswer && (
                           <button
                             onClick={() => {
-                              setCurrentAnswer(taskAnswers[currentTask.id] || "");
+                              setCurrentAnswer(
+                                taskAnswers[currentTask.id] || ""
+                              );
                               setIsEditing(false);
                             }}
                             className="px-2 py-1 rounded bg-gray-700 text-white hover:bg-gray-600 text-xs"
