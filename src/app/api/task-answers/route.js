@@ -62,6 +62,7 @@ export async function GET(request) {
 
 // POST - Save or update a task answer
 export async function POST(request) {
+  console.log('--- POST /api/task-answers called ---');
   try {
     const c = await cookies();
     const session = c.get('session')?.value;
@@ -87,6 +88,7 @@ export async function POST(request) {
       const body = await request.json();
       taskId = body.taskId;
       answer = body.answer;
+      console.log('Received:', { taskId, answer });
     } catch (e) {
       return NextResponse.json(
         { error: 'Invalid or empty JSON body' },
@@ -114,7 +116,6 @@ export async function POST(request) {
 
     // Prepare the update object
     const updateObj = {};
-    
     // Handle answer save/clear
     if (answer && answer.trim()) {
       // Save answer
@@ -123,11 +124,11 @@ export async function POST(request) {
       // Clear answer
       updateObj.$unset = { [`taskAnswers.${taskId}`]: "" };
     }
+    console.log('Update object:', updateObj);
 
     // Calculate new progress based on answered tasks
     const currentAnswers = currentTeam.taskAnswers || new Map();
     let newAnswerCount = 0;
-    
     if (answer && answer.trim()) {
       // Adding/updating an answer
       const answersWithNew = new Map(currentAnswers);
@@ -154,11 +155,10 @@ export async function POST(request) {
       };
     }
 
-
-    // After updating answer, handle timer resume/reset logic
-    let updatedTeam = await LoginModel.findOne({ teamID: teamID }).exec();
-    if (updatedTeam.timeStarted && updatedTeam.timeEnded) {
-      const timeUsed = Math.floor((updatedTeam.timeEnded - updatedTeam.timeStarted) / 1000);
+    // Resume timer logic (if needed)
+    const teamBeforeUpdate = await LoginModel.findOne({ teamID: teamID }).exec();
+    if (teamBeforeUpdate.timeStarted && teamBeforeUpdate.timeEnded) {
+      const timeUsed = Math.floor((teamBeforeUpdate.timeEnded - teamBeforeUpdate.timeStarted) / 1000);
       if (timeUsed < 7200) {
         // Resume timer: set new start, clear end
         const now = Date.now();
@@ -166,11 +166,15 @@ export async function POST(request) {
           { teamID: teamID },
           { $set: { timeStarted: now, timeEnded: null } }
         );
-        // Re-fetch updated team
-        updatedTeam = await LoginModel.findOne({ teamID: teamID }).exec();
       }
       // else: timer is over, do not reset
     }
+
+    // Actually update the answer/maze progress
+    await LoginModel.updateOne({ teamID: teamID }, updateObj);
+    // Fetch updated team after answer update
+    const updatedTeam = await LoginModel.findOne({ teamID: teamID }).exec();
+    console.log('Updated team:', updatedTeam);
 
     if (!updatedTeam) {
       return NextResponse.json(

@@ -17,23 +17,31 @@ const LogPage = () => {
 
   // --- API logic: fetch visible log titles from backend ---
   const [visibleTitles, setVisibleTitles] = useState(["Log 3", "Log 4"]);
+  const [logError, setLogError] = useState(false);
   useEffect(() => {
+    let isMounted = true;
     async function fetchVisibleLogs() {
       try {
         const res = await fetch("/api/visible-logs");
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data.visibleLogTitles)) {
-            setVisibleTitles(data.visibleLogTitles);
+            if (isMounted) setVisibleTitles(data.visibleLogTitles);
+            setLogError(false);
           }
+        } else {
+          setLogError(true);
         }
       } catch (e) {
-        // fallback: do nothing
+        setLogError(true);
       }
     }
     fetchVisibleLogs();
-    const interval = setInterval(fetchVisibleLogs, 2000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchVisibleLogs, 5000); // 5 seconds
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   // Keep visibleTitles in sync with solvedTasks
@@ -82,6 +90,9 @@ const LogPage = () => {
         ref={scrollContainerRef}
         className="flex-grow flex flex-col items-center justify-start py-10 px-10 overflow-y-auto"
       >
+        {logError && (
+          <div className="text-red-400 mb-4">Could not fetch logs. Please check your connection.</div>
+        )}
         {selectedLog ? (
           <div className="w-full flex flex-col items-center max-w-4xl animate-fadeIn">
             <Log
