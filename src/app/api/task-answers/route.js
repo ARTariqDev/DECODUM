@@ -154,12 +154,23 @@ export async function POST(request) {
       };
     }
 
-    // Update the team
-    const updatedTeam = await LoginModel.findOneAndUpdate(
-      { teamID: teamID },
-      updateObj,
-      { new: true }
-    ).exec();
+
+    // After updating answer, handle timer resume/reset logic
+    let updatedTeam = await LoginModel.findOne({ teamID: teamID }).exec();
+    if (updatedTeam.timeStarted && updatedTeam.timeEnded) {
+      const timeUsed = Math.floor((updatedTeam.timeEnded - updatedTeam.timeStarted) / 1000);
+      if (timeUsed < 7200) {
+        // Resume timer: set new start, clear end
+        const now = Date.now();
+        await LoginModel.updateOne(
+          { teamID: teamID },
+          { $set: { timeStarted: now, timeEnded: null } }
+        );
+        // Re-fetch updated team
+        updatedTeam = await LoginModel.findOne({ teamID: teamID }).exec();
+      }
+      // else: timer is over, do not reset
+    }
 
     if (!updatedTeam) {
       return NextResponse.json(

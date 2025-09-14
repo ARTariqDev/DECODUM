@@ -10,62 +10,92 @@ import Button from "@/components/Button";
 import Footer from "@/components/Footer";
 
 const Tasks = () => {
+  const handleCloseRulesModal = async () => {
+    setShowRulesModal(false);
+    setTimerStarted(true);
+    sessionStorage.setItem("seenRulesModal", "1");
+    // Start timer in backend if not already started
+    try {
+      const res = await fetch("/api/timer/time-started");
+      const { timeStarted } = await res.json();
+      if (!timeStarted) {
+        await fetch("/api/timer/time-started", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newTime: Date.now() }),
+        });
+      }
+    } catch (err) {
+      console.error("Error starting timer in backend:", err);
+    }
+    // Re-sync timer
+    if (typeof window !== "undefined") {
+      // Wait a moment for backend to update
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    }
+  };
   const [showDescription, setShowDescription] = useState(true);
-  const [showRulesModal, setShowRulesModal] = useState(true);
+  const [showRulesModal, setShowRulesModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [timerStarted, setTimerStarted] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(7200);
   const TIMER_KEY = "decodum_timer_start";
   const timerExpiredRef = useRef(false);
   const loggedOutRef = useRef(false);
-  // Show modal only on first login (sessionStorage flag)
+  // Show modal only on first login (sessionStorage flag) and sync timer
   useEffect(() => {
-    //example of how the timer api work. the same thing works for time-ended
-    // async function fetchTimeStarted() {
-    //   const res = await fetch("/api/timer/time-started");
-    //   const { timeStarted } = await res.json();
-    //
-    //   // If timeStarted/timeEnded is null, the user is logging for the first time
-
-    //   if (!timeStarted) {
-    //     await fetch("/api/timer/time-started", {
-    //       method: "POST",
-    //       body: JSON.stringify({ newTime: Date.now() }),
-    //     });
-    //   }
-    // }
-    // fetchTimeStarted();
-
-    if (typeof window !== "undefined") {
-      const seenRules = sessionStorage.getItem("seenRulesModal");
-      const timerStart = localStorage.getItem(TIMER_KEY);
-      if (!seenRules) {
-        setShowRulesModal(true);
-      } else {
-        setShowRulesModal(false);
-        // If timerStart is missing, set it now (first time after login/reload)
-        let start = timerStart ? parseInt(timerStart, 10) : null;
-        if (!start || isNaN(start)) {
-          start = Math.floor(Date.now() / 1000);
-          localStorage.setItem(TIMER_KEY, start.toString());
+    if (typeof window === "undefined") return;
+    const seenRules = sessionStorage.getItem("seenRulesModal");
+    if (!seenRules) {
+      setShowRulesModal(true);
+      setLoading(false);
+    } else {
+      setShowRulesModal(false);
+      // Only sync timer after modal is hidden
+      (async function syncTimerWithBackend() {
+        try {
+          const res = await fetch("/api/timer/time-started");
+          const { timeStarted } = await res.json();
+          let start = timeStarted;
+          if (!start) {
+            // If not started, POST to start timer
+            const now = Date.now();
+            await fetch("/api/timer/time-started", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ newTime: now }),
+            });
+            start = now;
+          }
+          // Check if timer already ended
+          const endedRes = await fetch("/api/timer/time-ended");
+          const { timeEnded } = await endedRes.json();
+          if (timeEnded) {
+            // Timer already ended, set timer to 0
+            setTimerSeconds(0);
+            setTimerStarted(true);
+            setLoading(false);
+            return;
+          }
+          // Calculate seconds left
+          const nowSec = Math.floor(Date.now() / 1000);
+          const startSec = Math.floor(start / 1000);
+          const elapsed = nowSec - startSec;
+          const left = Math.max(7200 - elapsed, 0);
+          setTimerSeconds(left);
+          setTimerStarted(true);
+          setLoading(false);
+        } catch (err) {
+          console.error("Error syncing timer with backend:", err);
+          setLoading(false);
         }
-        const now = Math.floor(Date.now() / 1000);
-        const elapsed = now - start;
-        const left = Math.max(7200 - elapsed, 0);
-        setTimerSeconds(left);
-        setTimerStarted(true);
-      }
+      })();
     }
   }, []);
 
-  // Start timer when modal is closed
-  const handleCloseRulesModal = () => {
-    setShowRulesModal(false);
-    setTimerStarted(true);
-    sessionStorage.setItem("seenRulesModal", "1");
-    // Always set timer start in localStorage when timer starts
-    localStorage.setItem(TIMER_KEY, Math.floor(Date.now() / 1000).toString());
-  };
-
+  // Timer interval effect (separate from loading/modal logic)
   useEffect(() => {
     if (!timerStarted || timerExpiredRef.current || loggedOutRef.current)
       return;
@@ -78,8 +108,6 @@ const Tasks = () => {
       if (!loggedOutRef.current) {
         setTimerSeconds((s) => {
           if (s <= 1) {
-            // Timer expired, clear from localStorage
-            localStorage.removeItem(TIMER_KEY);
             return 0;
           }
           return s - 1;
@@ -93,13 +121,21 @@ const Tasks = () => {
   const handleTimerExpire = async () => {
     if (loggedOutRef.current) return;
     loggedOutRef.current = true;
-    // Clear timer from localStorage
-    localStorage.removeItem(TIMER_KEY);
+    // Mark timer ended in backend
+    try {
+      await fetch("/api/timer/time-ended", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newTime: Date.now() }),
+      });
+    } catch (err) {
+      console.error("Error posting time-ended:", err);
+    }
     // Save all answers (simulate by calling saveAnswer for current task)
     await saveAnswer();
     // Log out user (clear session and redirect)
     await fetch("/api/auth/logout", { method: "POST" });
-    window.location.href = "/?logout=1"; // using query param here cause redirecting to '/' alone would not show the modal
+    window.location.href = "/?logout=1";
   };
   const [mazeProgress, setMazeProgress] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState("");
@@ -278,6 +314,10 @@ const Tasks = () => {
   };
 
   const hasAnswer = currentTask && taskAnswers[currentTask.id];
+
+  if (loading) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
