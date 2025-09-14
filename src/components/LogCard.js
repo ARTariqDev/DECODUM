@@ -1,6 +1,7 @@
 import React from "react";
 
 const LogCard = ({ title, date, desc, onView }) => {
+  console.log('[LogCard] Render:', title);
   
   const jumbleText = (str) => {
     const chars = str.split('');

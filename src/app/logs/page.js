@@ -18,9 +18,14 @@ const LogPage = () => {
   // --- API logic: fetch visible log titles from backend ---
   const [visibleTitles, setVisibleTitles] = useState(["Log 3", "Log 4"]);
   const [logError, setLogError] = useState(false);
+
+  const [logsLoading, setLogsLoading] = useState(true);
   useEffect(() => {
+    console.log('[LogPage] useEffect (mount)');
     let isMounted = true;
     async function fetchVisibleLogs() {
+      setLogsLoading(true);
+      console.log('[LogPage] Fetching /api/visible-logs');
       try {
         const res = await fetch("/api/visible-logs");
         if (res.ok) {
@@ -28,6 +33,7 @@ const LogPage = () => {
           if (Array.isArray(data.visibleLogTitles)) {
             if (isMounted) setVisibleTitles(data.visibleLogTitles);
             setLogError(false);
+            console.log('[LogPage] Set visibleTitles:', data.visibleLogTitles);
           }
         } else {
           setLogError(true);
@@ -35,12 +41,12 @@ const LogPage = () => {
       } catch (e) {
         setLogError(true);
       }
+      setLogsLoading(false);
     }
     fetchVisibleLogs();
-    const interval = setInterval(fetchVisibleLogs, 5000); // 5 seconds
     return () => {
       isMounted = false;
-      clearInterval(interval);
+      console.log('[LogPage] Unmount');
     };
   }, []);
 
@@ -110,25 +116,31 @@ const LogPage = () => {
             </button>
           </div>
         ) : (
-          <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full max-w-6xl animate-fadeIn">
-            {logs
-              .filter((log) => visibleTitles.includes(log.title))
-              .map((log, idx) => (
-                <div
-                  key={idx}
-                  ref={(el) => (logRefs.current[idx] = el)}
-                  onClick={() => handleLogSelect(log, idx)}
-                  className="cursor-pointer transform hover:scale-[1.02] transition duration-300"
-                >
-                  <LogCard
-                    title={log.title}
-                    date={log.date}
-                    desc={log.desc}
-                    onView={() => handleLogSelect(log, idx)} 
-                  />
-                </div>
-              ))}
-          </div>
+          logsLoading ? (
+            <div className="flex items-center justify-center w-full h-64">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-yellow-400"></div>
+            </div>
+          ) : (
+            <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full max-w-6xl animate-fadeIn">
+              {logs
+                .filter((log) => visibleTitles.includes(log.title))
+                .map((log, idx) => (
+                  <div
+                    key={idx}
+                    ref={(el) => (logRefs.current[idx] = el)}
+                    onClick={() => handleLogSelect(log, idx)}
+                    className="cursor-pointer transform hover:scale-[1.02] transition duration-300"
+                  >
+                    <LogCard
+                      title={log.title}
+                      date={log.date}
+                      desc={log.desc}
+                      onView={() => handleLogSelect(log, idx)} 
+                    />
+                  </div>
+                ))}
+            </div>
+          )
         )}
       </div>
 
