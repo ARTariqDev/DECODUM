@@ -315,7 +315,6 @@ const Tasks = () => {
 
   const hasAnswer = currentTask && taskAnswers[currentTask.id];
 
-
   if (loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
